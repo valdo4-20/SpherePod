@@ -323,6 +323,25 @@ body[data-view="flow"] #libClose { display: none; }
   *, *::before, *::after { animation: none !important; transition-duration: .01ms !important; }
   .lib-list { scroll-behavior: auto; }
 }
+
+/* SpherePod responsive polish and explicit player themes */
+:root[data-theme="light"]{--bg:#f5f5f7;--fg:#202127;--muted:#777983;--shadow:0 14px 34px rgba(25,25,35,.12);--body-a:#fff;--body-b:#e5e6eb;--wheel-a:#fff;--wheel-b:#e8e9ee;--wheel-icon:#888b95;--wheel-icon-hi:#272a32;--center-a:#fff;--center-b:#d9dbe2;--center-ink:#5f626d;--pearl-a:#fff;--pearl-b:#e4e5eb;--pearl-ink:#454853;--lib-bg:#fafafd;--lib-fg:#202127;--lib-muted:#777983;--lib-field:#eceef3;--sel:#dfe2ea;color-scheme:light}
+:root[data-theme="dark"]{--bg:#0d0d10;--fg:#f4f4f6;--muted:#9a9ba3;--shadow:0 18px 40px rgba(0,0,0,.48);--body-a:#29292f;--body-b:#17171b;--wheel-a:#29292f;--wheel-b:#1b1b20;--wheel-icon:#858690;--wheel-icon-hi:#fff;--center-a:#393941;--center-b:#141418;--center-ink:#b6b7bf;--pearl-a:#3c3c44;--pearl-b:#222228;--pearl-ink:#e2e2e8;--lib-bg:#1b1b20;--lib-fg:#f4f4f6;--lib-muted:#a0a1aa;--lib-field:#303038;--sel:#454550;color-scheme:dark}
+html,body{min-height:100%;height:100%;overflow:hidden}body{background:var(--bg)}
+.app{height:100dvh;max-height:100dvh;min-height:0;padding-top:max(5px,env(safe-area-inset-top));padding-bottom:max(5px,env(safe-area-inset-bottom));gap:clamp(6px,1vh,10px)}
+.device{flex:1 1 auto;min-height:0;gap:clamp(6px,1vh,10px)}
+.screen{flex:1 1 0;min-height:0;aspect-ratio:auto;border-radius:clamp(20px,4.5vw,32px)}
+.body{flex:0 0 clamp(174px,29svh,246px);height:clamp(174px,29svh,246px);min-height:0;padding:6px 0;border-radius:clamp(20px,4.5vw,32px)}
+.wheel{width:min(min(230px,64vw),calc(29svh - 12px));max-width:100%}
+.status{right:16px;justify-content:flex-start}.wordmark{display:none!important}
+.meta{left:12px;right:12px;bottom:10px;padding:10px 12px 8px;border-radius:18px}
+.meta h1{font-size:clamp(17px,4.7vw,21px);line-height:1.12}.meta p{margin:3px 0 6px;font-size:13px}
+.times{font-size:11px}.bar{height:18px}.cover-actions{top:9px;right:9px}.cover-actions .pbtn{width:34px;height:34px}
+.settings-pop{max-width:min(270px,calc(100vw - 36px))}.settings-pop .chip{font-size:12px;padding:8px 11px}.chip:disabled{opacity:.55}
+body.is-playing .screen .art img{animation:kb 22s ease-in-out infinite alternate}
+@media(max-height:700px){.body{flex-basis:clamp(150px,26svh,190px);height:clamp(150px,26svh,190px)}.wheel{width:min(min(180px,56vw),calc(26svh - 10px))}.meta h1{font-size:17px}.meta p{font-size:12px;margin-bottom:4px}}
+@media(max-height:560px) and (orientation:portrait){.app{gap:4px;padding-top:3px;padding-bottom:3px}.body{flex-basis:126px;height:126px}.wheel{width:120px}.wheel>button{transform:scale(.78)}}
+
 </style>
 
 <main class="app">
@@ -335,15 +354,17 @@ body[data-view="flow"] #libClose { display: none; }
       </div>
       <div class="settings-pop glass" id="settingsPop">
         <button class="chip" id="bAdd">Adicionar áudio ou vídeo</button>
-        <button class="chip" id="bStream">Transmitir por link</button>
+        <button class="chip" id="bStream">Reproduzir por link</button>
+        <button class="chip" id="bScan">Escanear músicas e buscar capas</button>
+        <button class="chip" id="bTheme">Tema: Escuro</button>
         <button class="chip" id="bView">Alternar visualização</button>
         <button class="chip" id="bShuffle2">Reprodução aleatória</button>
       </div>
-      <div class="status"><span id="clock">9:41</span><span class="wordmark" id="wordmark">SpherePod</span></div>
+      <div class="status"><span id="clock">9:41</span></div>
       <div class="vol glass" id="vol" aria-live="polite"><span>Volume</span><i><b id="volfill"></b></i></div>
       <div class="meta">
-        <h1 id="title">—</h1>
-        <p id="artist">—</p>
+        <h1 id="title">Sua música começa aqui</h1>
+        <p id="artist">Adicione um áudio ou vídeo para começar</p>
         <div class="bar" role="slider" aria-label="Posição da faixa" tabindex="0" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
           <div class="rail"><div class="fill js-fill"></div></div>
           <div class="knob js-knob"></div>
@@ -429,14 +450,7 @@ body[data-view="flow"] #libClose { display: none; }
   function lsGet(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
   function lsSet(k, v) { try { localStorage.setItem(k, v); } catch (e) {} }
 
-  /* ---------- Faixas de exemplo (sintetizadas) ---------- */
-  var scale = [0, 2, 4, 7, 9], prog = [0, 3, 4, 2];
-  var demos = [
-    { id: "demo-0", kind: "synth", title: "Jardim às Seis", artist: "Estúdio Alvorada", bpm: 84, root: 57, seed: 11, dens: 0.62, dur: 160, hue: 330, petals: 7 },
-    { id: "demo-1", kind: "synth", title: "Brisa de Cobre", artist: "Nina Castelo", bpm: 96, root: 62, seed: 29, dens: 0.55, dur: 185, hue: 28, petals: 5 },
-    { id: "demo-2", kind: "synth", title: "Luz de Janela", artist: "Orla Quieta", bpm: 72, root: 55, seed: 47, dens: 0.7, dur: 138, hue: 200, petals: 9 },
-    { id: "demo-3", kind: "synth", title: "Maré Baixa", artist: "Bruno Sótão", bpm: 108, root: 60, seed: 83, dens: 0.5, dur: 210, hue: 150, petals: 6 }
-  ];
+  /* Biblioteca vazia por padrão: só toca arquivos adicionados pelo usuário. */
   var imported = [], list = [];
   var cur = 0, focus = 0, pos = 0, playing = false, shuffle = false, volume = 0.6;
 
@@ -465,11 +479,9 @@ body[data-view="flow"] #libClose { display: none; }
       '<g transform="translate(200 200)">' + p + '<circle r="34" fill="hsl(' + (hue + 40) + ',90%,86%)"/><circle r="16" fill="hsl(' + (hue + 20) + ',80%,60%)"/></g></svg>';
   }
   function svgUrl(T) { return "data:image/svg+xml;charset=utf-8," + encodeURIComponent(artSvg(T)); }
-  demos.forEach(function (T) { T.coverUrl = svgUrl(T); });
-
   function rebuild(keepId) {
     var id = keepId || (list[cur] && list[cur].id);
-    list = imported.concat(demos);
+    list = imported.slice();
     var i = list.findIndex(function (t) { return t.id === id; });
     cur = i < 0 ? 0 : i;
     focus = cur;
@@ -572,8 +584,8 @@ body[data-view="flow"] #libClose { display: none; }
   }
   function makeTrack(rec) {
     var hs = strHash(rec.title + rec.id);
-    var T = { id: rec.id, kind: "file", title: rec.title, artist: rec.artist, album: rec.album, dur: rec.dur || 0, blob: rec.file, added: rec.added, hue: hs % 360, petals: 5 + (hs % 5), seed: hs % 997, size: rec.file ? rec.file.size : 0, fmt: rec.file ? fileFormat(rec.file) : "" };
-    T.coverUrl = rec.cover ? URL.createObjectURL(rec.cover) : svgUrl(T);
+    var T = { id: rec.id, kind: "file", title: rec.title, artist: rec.artist, album: rec.album, dur: rec.dur || 0, blob: rec.file, cover: rec.cover || null, artworkUrl: rec.artworkUrl || "", added: rec.added, hue: hs % 360, petals: 5 + (hs % 5), seed: hs % 997, size: rec.file ? rec.file.size : 0, fmt: rec.file ? fileFormat(rec.file) : "" };
+    T.coverUrl = rec.cover ? URL.createObjectURL(rec.cover) : (rec.artworkUrl || svgUrl(T));
     return T;
   }
 
@@ -605,36 +617,7 @@ body[data-view="flow"] #libClose { display: none; }
     bus = ctx.createGain();
     bus.connect(master); bus.connect(wet);
   }
-  function tone(freq, when, dur, type, gain, atk) {
-    var o = ctx.createOscillator(), g = ctx.createGain();
-    o.type = type; o.frequency.value = freq;
-    g.gain.setValueAtTime(0.0001, when);
-    g.gain.linearRampToValueAtTime(gain, when + (atk || 0.01));
-    g.gain.exponentialRampToValueAtTime(0.0001, when + dur);
-    o.connect(g); g.connect(bus);
-    o.start(when); o.stop(when + dur + 0.05);
-  }
-  function mtof(m) { return 440 * Math.pow(2, (m - 69) / 12); }
-  function playStep(step, when, T, sd) {
-    var bar = Math.floor(step / 8), inBar = step % 8, rootNote = T.root + scale[prog[bar % 4] % 5] - 12;
-    if (inBar === 0) [0, 7, 16].forEach(function (iv, k) { tone(mtof(rootNote + iv), when, sd * 8, "triangle", 0.07 - k * 0.012, 0.35); });
-    if (h(T.seed * 977 + step) < T.dens) {
-      var idx = Math.floor(h(T.seed * 31 + step * 7) * 10), note = T.root + 12 + scale[idx % 5] + (idx >= 5 ? 12 : 0);
-      tone(mtof(note), when, sd * 3.2, "sine", 0.16, 0.008);
-      tone(mtof(note + 12), when, sd * 1.2, "triangle", 0.035, 0.005);
-    }
-  }
-  function sched() {
-    var T = list[cur];
-    if (!playing || !ctx || !T || T.kind !== "synth") return;
-    var sd = 60 / T.bpm / 2, now = ctx.currentTime;
-    for (;;) {
-      var st = t0 + nextStep * sd;
-      if (st > now + 0.4) break;
-      if (st >= now - 0.04) playStep(nextStep, st, T, sd);
-      nextStep++;
-    }
-  }
+  /* A reprodução é sempre feita a partir de arquivos importados pelo usuário. */
   function usesBuf(T) { return T.kind === "file" && T.mode === "buf"; }
   function curPos() {
     var T = list[cur];
@@ -702,13 +685,7 @@ body[data-view="flow"] #libClose { display: none; }
     halt();
     pos = Math.max(0, Math.min((T.dur || 1e9) - 0.5, p));
     playing = true;
-    if (T.kind === "synth") {
-      if (!ctx) { playing = false; return; }
-      t0 = ctx.currentTime - pos;
-      nextStep = Math.ceil(pos / (60 / T.bpm / 2));
-      timer = setInterval(sched, 80);
-      sched();
-    } else if (usesBuf(T)) {
+    if (usesBuf(T)) {
       bufPlay(pos, cur);
     } else {
       var go = function () {
@@ -729,7 +706,7 @@ body[data-view="flow"] #libClose { display: none; }
   }
   function toggle() { if (!list.length) return; playing ? pause() : startAt(pos); }
   function load(i, auto) {
-    if (!list.length) return;
+    if (!list.length) { showEmpty(); return; }
     cur = (i + list.length) % list.length;
     focus = cur;
     halt();
@@ -757,7 +734,6 @@ body[data-view="flow"] #libClose { display: none; }
     (function f() {
       if (!playing) return;
       var T = list[cur];
-      if (T && T.kind === "synth" && curPos() >= T.dur - 0.05) { next(); return; }
       ui();
       raf = requestAnimationFrame(f);
     })();
@@ -888,7 +864,6 @@ body[data-view="flow"] #libClose { display: none; }
     return arr;
   }
   function subLine(T) {
-    if (T.kind !== "file") return T.artist + " · exemplo gerado no app";
     var d = T.added ? new Date(T.added).toLocaleDateString("pt-BR", { day: "2-digit", month: "2-digit", year: "2-digit" }) : "";
     return [T.artist, T.album, T.fmt, T.size ? fmtBytes(T.size) : "", d ? "adicionada em " + d : ""].filter(Boolean).join(" · ");
   }
@@ -971,6 +946,19 @@ body[data-view="flow"] #libClose { display: none; }
     document.body.classList.remove("lib-open");
     $("bLib").setAttribute("aria-pressed", "false"); $("bLib").classList.remove("on");
   }
+  function showEmpty() {
+    playing = false; pos = 0; halt();
+    $("title").textContent = "Sua música começa aqui";
+    $("artist").textContent = "Adicione um áudio ou vídeo para começar";
+    $("artImg").removeAttribute("src");
+    $("artImg").classList.remove("pop");
+    document.title = "SpherePod — seu player pessoal";
+    $(".js-fill").forEach(function (e) { e.style.width = "0%"; });
+    $(".js-knob").forEach(function (e) { e.style.left = "0%"; });
+    $(".js-tcur").forEach(function (e) { e.textContent = "0:00"; });
+    $(".js-trem").forEach(function (e) { e.textContent = "--:--"; });
+    document.body.classList.remove("is-playing");
+  }
   function removeTrack(id) {
     var idx = list.findIndex(function (t) { return t.id === id; });
     if (idx < 0) return;
@@ -981,8 +969,9 @@ body[data-view="flow"] #libClose { display: none; }
     if (T.coverUrl && T.coverUrl.indexOf("blob:") === 0) URL.revokeObjectURL(T.coverUrl);
     if (bufCache.id === id) bufCache = { id: null, buf: null };
     dbDel(id).catch(function () {});
-    list = imported.concat(demos);
-    if (wasCur) { buildFlow(); load(Math.min(idx, list.length - 1), false); }
+    list = imported.slice();
+    if (wasCur && list.length) { buildFlow(); load(Math.min(idx, list.length - 1), false); }
+    else if (wasCur) { buildFlow(); showEmpty(); }
     else { rebuild(keep); buildFlow(); ui(); }
     renderLib();
     toast("Removida da biblioteca.");
@@ -1020,9 +1009,9 @@ body[data-view="flow"] #libClose { display: none; }
           var rec = {
             id: "u-" + Date.now() + "-" + k + "-" + Math.floor(Math.random() * 1e5),
             title: tags.title || normalizeTrackTitle(base) || "Sem título",
-            artist: tags.artist || "Artista desconhecido",
+            artist: tags.artist || "Artista não identificado",
             album: tags.album || "",
-            dur: dur, added: Date.now() + k, file: file, cover: tags.cover || null
+            dur: dur, added: Date.now() + k, file: file, cover: tags.cover || null, artworkUrl: ""
           };
           added.push(makeTrack(rec));
           return dbPut(rec).catch(function () { failedSave = true; });
@@ -1071,6 +1060,62 @@ body[data-view="flow"] #libClose { display: none; }
     if (p && p.catch) p.catch(function(){ toast("Tela cheia não disponível neste navegador."); });
   });
   $("bSettings").addEventListener("click", function () { $("settingsPop").classList.toggle("open"); });
+  var activeTheme = lsGet("spherepod-theme") || "dark";
+  function applyTheme() {
+    document.documentElement.setAttribute("data-theme", activeTheme);
+    $("bTheme").textContent = "Tema: " + (activeTheme === "dark" ? "Escuro" : "Claro");
+    var metaTheme = document.querySelector('meta[name="theme-color"]');
+    if (metaTheme) metaTheme.setAttribute("content", activeTheme === "dark" ? "#0d0d10" : "#f4f4f6");
+  }
+  $("bTheme").addEventListener("click", function () {
+    activeTheme = activeTheme === "dark" ? "light" : "dark";
+    lsSet("spherepod-theme", activeTheme); applyTheme();
+  });
+  applyTheme();
+
+  function searchCatalogTrack(T) {
+    var term = [T.title, T.artist && T.artist !== "Artista não identificado" ? T.artist : ""].filter(Boolean).join(" ");
+    var url = "https://itunes.apple.com/search?media=music&entity=song&limit=12&country=br&term=" + encodeURIComponent(term);
+    return fetch(url).then(function (r) { if (!r.ok) throw new Error("Busca indisponível"); return r.json(); }).then(function (data) {
+      function key(v) { return normalizeTrackTitle(v || "").toLowerCase(); }
+      var wanted = key(T.title), artistWanted = key(T.artist);
+      var candidates = (data.results || []).map(function (x) {
+        var title = key(x.trackName), artist = key(x.artistName);
+        var titleScore = title === wanted ? 1 : (title.indexOf(wanted) >= 0 || wanted.indexOf(title) >= 0 ? 0.82 : 0);
+        var artistScore = !artistWanted || artistWanted === key("Artista não identificado") ? 0.5 : (artist === artistWanted ? 1 : (artist.indexOf(artistWanted) >= 0 || artistWanted.indexOf(artist) >= 0 ? 0.8 : 0));
+        return { item: x, score: titleScore * 0.72 + artistScore * 0.28, titleScore: titleScore };
+      }).filter(function (x) { return x.titleScore >= 0.8; }).sort(function (a, b) { return b.score - a.score; });
+      if (!candidates.length) return null;
+      var x = candidates[0].item, art = x.artworkUrl100 || "";
+      if (art) art = art.replace(/\\d+x\\d+bb\\./, "600x600bb.");
+      return { title: x.trackName || T.title, artist: x.artistName || T.artist, album: x.collectionName || T.album || "", artworkUrl: art };
+    });
+  }
+  $("bScan").addEventListener("click", function () {
+    $("settingsPop").classList.remove("open");
+    if (!imported.length) { toast("Adicione músicas antes de iniciar a busca."); return; }
+    var btn = $("bScan"), found = 0, done = 0, total = imported.length;
+    btn.disabled = true; btn.textContent = "Escaneando 0/" + total + "…";
+    imported.reduce(function (chain, T) {
+      return chain.then(function () {
+        return searchCatalogTrack(T).then(function (meta) {
+          if (meta) {
+            T.title = meta.title; T.artist = meta.artist; T.album = meta.album;
+            if (!T.cover && meta.artworkUrl) { T.artworkUrl = meta.artworkUrl; T.coverUrl = meta.artworkUrl; }
+            var rec = { id: T.id, title: T.title, artist: T.artist, album: T.album, dur: T.dur, added: T.added, file: T.blob, cover: T.cover, artworkUrl: T.artworkUrl || "" };
+            return dbPut(rec).then(function () { found++; });
+          }
+        }).catch(function () {}).then(function () {
+          done++; btn.textContent = "Escaneando " + done + "/" + total + "…";
+        });
+      });
+    }, Promise.resolve()).then(function () {
+      btn.disabled = false; btn.textContent = "Escanear músicas e buscar capas";
+      if (list[cur]) { buildFlow(); setNowPlaying(list[cur]); ui(); }
+      renderLib();
+      toast("Escaneamento concluído: " + found + " de " + total + " músicas atualizadas.");
+    });
+  });
   $("bStream").addEventListener("click", function () { $("settingsPop").classList.remove("open"); $("streamDialog").classList.add("open"); $("streamDialog").setAttribute("aria-hidden","false"); $("streamUrl").focus(); });
   $("streamClose").addEventListener("click", function () { $("streamDialog").classList.remove("open"); $("streamDialog").setAttribute("aria-hidden","true"); });
   $("streamForm").addEventListener("submit", function (ev) {
@@ -1298,7 +1343,7 @@ body[data-view="flow"] #libClose { display: none; }
   rebuild();
   applyView();
   buildFlow();
-  load(0, false);
+  if (list.length) load(0, false); else showEmpty();
 
   dbAll().then(function (recs) {
     if (!recs || !recs.length) return;
