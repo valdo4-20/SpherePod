@@ -396,6 +396,34 @@ body.has-track .screen .art img{animation:kb 22s ease-in-out infinite alternate}
   .meta { padding-top:18px; }
 }
 
+
+/* Temas completos: painéis acompanham o tema sem alterar a arte da capa. */
+:root[data-theme="light"] body { background:var(--bg); color:var(--fg); }
+:root[data-theme="light"] .glass {
+  background:linear-gradient(140deg,rgba(255,255,255,.88),rgba(238,239,244,.82));
+  color:var(--fg); border:1px solid rgba(40,42,52,.09);
+  box-shadow:inset 0 0 18px rgba(255,255,255,.72),0 10px 28px rgba(30,32,44,.10);
+}
+:root[data-theme="light"] .meta {
+  color:#202127; background:linear-gradient(140deg,rgba(255,255,255,.76),rgba(245,246,250,.68));
+  border-color:rgba(255,255,255,.72); box-shadow:inset 0 1px rgba(255,255,255,.8),0 12px 28px rgba(0,0,0,.12);
+}
+:root[data-theme="light"] .meta h1 { color:#202127; text-shadow:none; }
+:root[data-theme="light"] .meta p,
+:root[data-theme="light"] .times,
+:root[data-theme="light"] .vol2 { color:rgba(32,33,39,.76); }
+:root[data-theme="light"] .bar .rail { background:rgba(32,33,39,.24); }
+:root[data-theme="light"] .bar .fill,
+:root[data-theme="light"] .bar .knob { background:#333640; }
+:root[data-theme="light"] .fctl { background:linear-gradient(180deg,rgba(255,255,255,.94),rgba(229,231,237,.94)); color:var(--fg); }
+:root[data-theme="light"] .tools,
+:root[data-theme="light"] .hint { color:var(--muted); }
+:root[data-theme="light"] .settings-pop { background:rgba(250,250,253,.96); border:1px solid rgba(35,37,48,.1); }
+:root[data-theme="light"] .settings-pop .chip { background:var(--lib-field); color:var(--lib-fg); }
+:root[data-theme="dark"] .glass,
+:root[data-theme="dark"] .meta,
+:root[data-theme="dark"] .meta h1 { color:#fff; }
+
 </style>
 
 <svg aria-hidden="true" width="0" height="0" style="position:absolute"><filter id="sphere-liquid" x="-15%" y="-15%" width="130%" height="130%"><feTurbulence type="fractalNoise" baseFrequency=".012 .028" numOctaves="2" seed="7" result="noise"><animate attributeName="baseFrequency" dur="8s" values=".008 .02;.018 .035;.008 .02" repeatCount="indefinite"/></feTurbulence><feDisplacementMap in="SourceGraphic" in2="noise" scale="13" xChannelSelector="R" yChannelSelector="G"><animate attributeName="scale" dur="7s" values="7;17;7" repeatCount="indefinite"/></feDisplacementMap></filter></svg>
@@ -1072,11 +1100,20 @@ body.has-track .screen .art img{animation:kb 22s ease-in-out infinite alternate}
       .replace(/[^\p{L}\p{N}\s]/gu, " ").replace(/\s+/g, " ").trim();
   }
   var AUDIO_RE = /\.(mp3|m4a|aac|flac|wav|ogg|opus|oga|weba)$/i;
-  var VIDEO_RE = /\.(mp4|m4v|mov|webm|ogv|ogg|mkv|avi)$/i;
+  /* OGG é áudio por padrão; só será vídeo se o MIME declarar video/. */
+  var VIDEO_RE = /\.(mp4|m4v|mov|webm|ogv|mkv|avi)$/i;
   function importFiles(files) {
     var picked = Array.prototype.slice.call(files || []);
-    var vids = picked.filter(function (f) { return (f.type && f.type.indexOf("video") === 0) || VIDEO_RE.test(f.name); });
-    var arr = picked.filter(function (f) { return (f.type && f.type.indexOf("audio") === 0) || AUDIO_RE.test(f.name); });
+    function mediaKind(f) {
+      var mime = String(f.type || "").toLowerCase();
+      if (mime.indexOf("video/") === 0) return "video";
+      if (mime.indexOf("audio/") === 0) return "audio";
+      if (VIDEO_RE.test(f.name)) return "video";
+      if (AUDIO_RE.test(f.name)) return "audio";
+      return "";
+    }
+    var vids = picked.filter(function (f) { return mediaKind(f) === "video"; });
+    var arr = picked.filter(function (f) { return mediaKind(f) === "audio"; });
     if (vids.length) {
       var vf = vids[0];
       openVideo(URL.createObjectURL(vf), vf.name, true);
