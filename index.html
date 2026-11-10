@@ -128,7 +128,17 @@ body.is-playing .pbtn.big { animation: pearl 3.2s ease-in-out infinite; }
 /* Retrato: tela */
 .device { display: flex; flex-direction: column; gap: 18px; }
 .screen { position: relative; aspect-ratio: 1 / 1.06; border-radius: 36px; overflow: hidden; isolation: isolate; background: #1b1b1f; box-shadow: var(--shadow); }
-.screen .art { position: absolute; inset: 0; }
+.screen .art { position: absolute; inset: 0; overflow:hidden; }
+.screen .art::before { content:""; position:absolute; inset:-5%; background-image:var(--cover-backdrop); background-size:cover; background-position:center; filter:blur(18px) brightness(.62); transform:scale(1.08); opacity:0; transition:opacity .35s; }
+.screen .art img { position:relative; z-index:1; }
+.screen .art.motion-float::before { opacity:.8; }
+.screen .art.motion-float img { animation: cover-float 7s cubic-bezier(.45,0,.55,1) infinite; filter:drop-shadow(0 18px 18px rgba(0,0,0,.35)); }
+.screen .art.motion-liquid img { filter:url(#sphere-liquid); }
+.screen .art.motion-tear::after { content:""; position:absolute; z-index:2; left:63%; top:31%; width:9px; height:72px; pointer-events:none; opacity:.9; background:linear-gradient(90deg,rgba(255,255,255,.12),rgba(210,239,255,.8) 45%,rgba(255,255,255,.25)); border-radius:70% 45% 65% 55%; transform:rotate(7deg); filter:drop-shadow(0 1px 3px rgba(0,0,0,.35)); animation:tear-run 5.8s ease-in infinite; }
+.screen .art.motion-tear::before { opacity:.18; }
+@keyframes cover-float { 0%,100% { transform:translateY(-7px) scale(.965); } 50% { transform:translateY(7px) scale(.965); } }
+@keyframes tear-run { 0%,12% { clip-path:inset(0 0 100% 0); transform:translateY(-12px) rotate(7deg); } 45%,72% { clip-path:inset(0 0 0 0); transform:translateY(8px) rotate(7deg); } 100% { clip-path:inset(100% 0 0 0); transform:translateY(24px) rotate(7deg); } }
+@media (prefers-reduced-motion:reduce) { .screen .art.motion-float img,.screen .art.motion-tear::after { animation:none!important; } }
 .screen .art img { width: 100%; height: 100%; object-fit: cover; display: block; transform-origin: 50% 40%; animation: kb 22s ease-in-out infinite alternate; animation-play-state: paused; }
 body.is-playing .screen .art img { animation-play-state: running; }
 .screen .art img.pop { animation: pop .6s var(--ease), kb 22s ease-in-out infinite alternate; animation-play-state: running, paused; }
@@ -344,6 +354,7 @@ body.has-track .screen .art img{animation:kb 22s ease-in-out infinite alternate}
 
 </style>
 
+<svg aria-hidden="true" width="0" height="0" style="position:absolute"><filter id="sphere-liquid" x="-15%" y="-15%" width="130%" height="130%"><feTurbulence type="fractalNoise" baseFrequency=".012 .028" numOctaves="2" seed="7" result="noise"><animate attributeName="baseFrequency" dur="8s" values=".008 .02;.018 .035;.008 .02" repeatCount="indefinite"/></feTurbulence><feDisplacementMap in="SourceGraphic" in2="noise" scale="13" xChannelSelector="R" yChannelSelector="G"><animate attributeName="scale" dur="7s" values="7;17;7" repeatCount="indefinite"/></feDisplacementMap></filter></svg>
 <main class="app">
   <section class="device" id="device">
     <div class="screen" id="screen" aria-label="Tocando agora">
@@ -357,6 +368,11 @@ body.has-track .screen .art img{animation:kb 22s ease-in-out infinite alternate}
         <button class="chip" id="bStream">Reproduzir por link</button>
         <button class="chip" id="bScan">Escanear músicas e buscar capas</button>
         <button class="chip" id="bTheme">Tema: Escuro</button>
+        <label class="chip motion-setting" for="motionMode">Movimento da capa
+          <select id="motionMode" aria-label="Movimento da capa" style="display:block;width:100%;margin-top:7px;padding:7px;border:0;border-radius:9px;background:var(--lib-field);color:var(--lib-fg);font:inherit">
+            <option value="auto">Automático (capas reconhecidas)</option><option value="liquid">Fluidez líquida</option><option value="tear">Lágrima</option><option value="float">Flutuação em camadas</option><option value="off">Desativado</option>
+          </select>
+        </label>
         <button class="chip" id="bView">Alternar visualização</button>
         <button class="chip" id="bShuffle2">Reprodução aleatória</button>
       </div>
@@ -740,10 +756,34 @@ body.has-track .screen .art img{animation:kb 22s ease-in-out infinite alternate}
   }
 
   /* ---------- Interface ---------- */
+  var motionPreference = lsGet("spherepod-motion") || "auto";
+  function detectCoverMotion(T) {
+    var meta = [T.artist,T.album,T.title].join(" ").toLowerCase();
+    if (/maroon\\s*5/.test(meta) && /songs?\\s+about\\s+jane/.test(meta)) return "liquid";
+    if (/billie\\s+eilish/.test(meta) && /(when we all fall asleep|dont smile at me|happier than ever)/.test(meta)) return "tear";
+    if (/lil\\s+nas\\s*x/.test(meta) && /(montero|7 ep)/.test(meta)) return "float";
+    return "off";
+  }
+  function applyCoverMotion(T) {
+    var art = document.querySelector(".screen .art");
+    var mode = motionPreference === "auto" ? detectCoverMotion(T) : motionPreference;
+    art.classList.remove("motion-liquid","motion-tear","motion-float");
+    if (mode !== "off") art.classList.add("motion-" + mode);
+    art.style.setProperty("--cover-backdrop", T && T.coverUrl ? 'url("' + String(T.coverUrl).replace(/["\\\\]/g,"%22") + '")' : "none");
+    $("motionMode").value = motionPreference;
+  }
+  $("motionMode").value = motionPreference;
+  $("motionMode").addEventListener("change", function () {
+    motionPreference = $("motionMode").value;
+    lsSet("spherepod-motion", motionPreference);
+    if (list[cur]) applyCoverMotion(list[cur]);
+    toast(motionPreference === "auto" ? "Movimento automático ativado." : "Movimento da capa atualizado.");
+  });
+
   function setNowPlaying(T) {
     var img = $("artImg");
     img.classList.remove("pop"); void img.offsetWidth;
-    img.src = T.coverUrl; img.classList.add("pop"); document.body.classList.add("has-track");
+    img.src = T.coverUrl; img.classList.add("pop"); document.body.classList.add("has-track"); applyCoverMotion(T);
     $("title").textContent = T.title;
     $("artist").textContent = T.artist;
     [$("title"), $("artist")].forEach(function (e) { e.style.animation = "none"; void e.offsetWidth; e.style.animation = ""; });
@@ -951,7 +991,7 @@ body.has-track .screen .art img{animation:kb 22s ease-in-out infinite alternate}
     $("title").textContent = "Sua música começa aqui";
     $("artist").textContent = "Adicione um áudio ou vídeo para começar";
     $("artImg").removeAttribute("src");
-    $("artImg").classList.remove("pop");
+    $("artImg").classList.remove("pop"); document.querySelector(".screen .art").classList.remove("motion-liquid","motion-tear","motion-float");
     document.title = "SpherePod — seu player pessoal";
     $(".js-fill").forEach(function (e) { e.style.width = "0%"; });
     $(".js-knob").forEach(function (e) { e.style.left = "0%"; });
