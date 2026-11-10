@@ -5,7 +5,15 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#0d0d10">
 <meta name="description" content="SpherePod — seu player pessoal de áudio e vídeo.">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="SpherePod">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <title>SpherePod — seu player pessoal</title>
+<link rel="apple-touch-icon" sizes="180x180" href="./assets/spherepod-apple-touch-icon.png">
+<link rel="manifest" href="./manifest.webmanifest">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 </head>
 <body>
 <meta name="claude:viewport-fit-sides" content="cover">
@@ -15,7 +23,7 @@
   --bg: #f4f4f6;
   --fg: #1d1d21;
   --muted: #7a7b83;
-  --accent: #e0457b;
+  --accent: #17181d;
   --shadow: 0 18px 40px rgba(20, 20, 32, .16);
   --body-a: #f2f2f5;
   --body-b: #d8d8dd;
@@ -37,11 +45,12 @@
   --danger: #e5484d;
   --spring: cubic-bezier(.3, 1.5, .5, 1);
   --ease: cubic-bezier(.22, 1, .36, 1);
-  --font-ui: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-ui: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-display: "Botanic Grotesque", Inter, ui-sans-serif, system-ui, sans-serif;
 }
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
-    --bg: #0d0d10; --fg: #f4f4f6; --muted: #9a9ba3; --accent: #ff6b9a;
+    --bg: #0d0d10; --fg: #f4f4f6; --muted: #9a9ba3; --accent: #ffffff;
     --shadow: 0 18px 40px rgba(0, 0, 0, .55);
     --body-a: #2b2b30; --body-b: #19191c;
     --wheel-a: #2a2a2f; --wheel-b: #1d1d21; --wheel-icon: #7f8088; --wheel-icon-hi: #ffffff;
@@ -52,7 +61,7 @@
   }
 }
 :root[data-theme="dark"] {
-  --bg: #0d0d10; --fg: #f4f4f6; --muted: #9a9ba3; --accent: #ff6b9a;
+  --bg: #0d0d10; --fg: #f4f4f6; --muted: #9a9ba3; --accent: #ffffff;
   --shadow: 0 18px 40px rgba(0, 0, 0, .55);
   --body-a: #2b2b30; --body-b: #19191c;
   --wheel-a: #2a2a2f; --wheel-b: #1d1d21; --wheel-icon: #7f8088; --wheel-icon-hi: #ffffff;
@@ -71,6 +80,7 @@ body {
   overflow-x: hidden;
 }
 button { font: inherit; color: inherit; }
+h1, h2, h3 { font-family: var(--font-display); }
 svg { fill: currentColor; }
 button:focus-visible, input:focus-visible, .bar:focus-visible, .cf-item:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 
@@ -107,7 +117,7 @@ body[data-view="flow"] .app { max-width: 1180px; height: 100%; }
   display: grid; place-items: center; color: var(--pearl-ink);
   background: linear-gradient(180deg, var(--pearl-a), var(--pearl-b));
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, .8), inset 0 -2px 5px rgba(0, 0, 0, .1), 0 6px 16px rgba(0, 0, 0, .16);
-  transition: transform .45s var(--spring), color .2s;
+  transition: transform .45s var(--spring), color .2s, opacity .18s ease;
 }
 .pbtn svg { width: 22px; height: 22px; }
 .pbtn:hover { filter: brightness(1.03); }
@@ -122,39 +132,47 @@ body.is-playing .pbtn.big { animation: pearl 3.2s ease-in-out infinite; }
   0%, 100% { box-shadow: inset 0 1px 0 rgba(255,255,255,.8), inset 0 -2px 5px rgba(0,0,0,.1), 0 6px 16px rgba(0,0,0,.16), 0 0 0 0 rgba(255,255,255,0); }
   50% { box-shadow: inset 0 1px 0 rgba(255,255,255,.8), inset 0 -2px 5px rgba(0,0,0,.1), 0 6px 16px rgba(0,0,0,.16), 0 0 22px 3px rgba(255,255,255,.6); }
 }
-.chip { border: 0; border-radius: 99px; padding: 8px 14px; font-size: 13px; font-weight: 600; background: var(--lib-field); color: var(--lib-fg); cursor: pointer; transition: transform .4s var(--spring); white-space: nowrap; }
-.chip:active { transform: scale(.94); }
+.chip { border: 0; border-radius: 99px; padding: 8px 14px; font-size: 13px; font-weight: 600; background: var(--lib-field); color: var(--lib-fg); cursor: pointer; transition: transform .4s var(--spring), opacity .18s ease; white-space: nowrap; }
+.chip:active,.pbtn:active { opacity:.72; }
 
 /* Retrato: tela */
 .device { display: flex; flex-direction: column; gap: 18px; }
 .screen { position: relative; aspect-ratio: 1 / 1.06; border-radius: 36px; overflow: hidden; isolation: isolate; background: #1b1b1f; box-shadow: var(--shadow); }
 .screen .art { position: absolute; inset: 0; overflow:hidden; }
 .screen .art::before { content:""; position:absolute; inset:-5%; background-image:var(--cover-backdrop); background-size:cover; background-position:center; filter:blur(18px) brightness(.62); transform:scale(1.08); opacity:0; transition:opacity .35s; }
-.screen .art img { position:relative; z-index:1; }
+.screen .art img, .screen .art video { position:relative; z-index:1; }
 .screen .art.motion-float::before { opacity:.8; }
-.screen .art.motion-float img { animation: cover-float 7s cubic-bezier(.45,0,.55,1) infinite; filter:drop-shadow(0 18px 18px rgba(0,0,0,.35)); }
-.screen .art.motion-liquid img { filter:url(#sphere-liquid); }
-.screen .art.motion-tear::after { content:""; position:absolute; z-index:2; left:63%; top:31%; width:9px; height:72px; pointer-events:none; opacity:.9; background:linear-gradient(90deg,rgba(255,255,255,.12),rgba(210,239,255,.8) 45%,rgba(255,255,255,.25)); border-radius:70% 45% 65% 55%; transform:rotate(7deg); filter:drop-shadow(0 1px 3px rgba(0,0,0,.35)); animation:tear-run 5.8s ease-in infinite; }
-.screen .art.motion-tear::before { opacity:.18; }
-@keyframes cover-float { 0%,100% { transform:translateY(-7px) scale(.965); } 50% { transform:translateY(7px) scale(.965); } }
-@keyframes tear-run { 0%,12% { clip-path:inset(0 0 100% 0); transform:translateY(-12px) rotate(7deg); } 45%,72% { clip-path:inset(0 0 0 0); transform:translateY(8px) rotate(7deg); } 100% { clip-path:inset(100% 0 0 0); transform:translateY(24px) rotate(7deg); } }
-@media (prefers-reduced-motion:reduce) { .screen .art.motion-float img,.screen .art.motion-tear::after { animation:none!important; } }
-.screen .art img { width: 100%; height: 100%; object-fit: cover; display: block; transform-origin: 50% 40%; animation: kb 22s ease-in-out infinite alternate; animation-play-state: paused; }
-body.is-playing .screen .art img { animation-play-state: running; }
-.screen .art img.pop { animation: pop .6s var(--ease), kb 22s ease-in-out infinite alternate; animation-play-state: running, paused; }
-body.is-playing .screen .art img.pop { animation-play-state: running, running; }
-@keyframes kb { from { transform: scale(1); } to { transform: scale(1.09) translate(-1.5%, -1%); } }
-@keyframes pop { from { opacity: 0; transform: scale(.94); } to { opacity: 1; transform: scale(1); } }
+.screen .art.motion-zoom img { animation-play-state:running; }
+.screen .art.motion-float img { animation: cover-float 8s ease-in-out infinite; animation-play-state:running; filter:drop-shadow(0 18px 18px rgba(0,0,0,.35)); }
+.screen .art.motion-off img { animation:none; }
+.screen .art img { width: 100%; height: 100%; object-fit: cover; display: block; transform-origin: 50% 50%; animation: cover-zoom 36s ease-in-out infinite alternate; animation-play-state: paused; }
+.screen .art video { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; display:none; }
+.screen .art.video-cover video { display:block; }
+.screen .art.video-cover img { visibility:hidden; }
+.screen .art img.pop { animation: cover-pop .6s var(--ease), cover-zoom 36s ease-in-out infinite alternate; animation-play-state: running, paused; }
+.screen .art.motion-zoom img.pop { animation-play-state:running,running; }
+.screen .art.motion-float img.pop { animation:cover-pop .6s var(--ease),cover-float 8s ease-in-out infinite; animation-play-state:running,running; }
+.screen .art.motion-off img.pop { animation:cover-pop .6s var(--ease); animation-play-state:running; }
+@keyframes cover-zoom { from { transform:scale(1); } to { transform:scale(1.025); } }
+@keyframes cover-float { 0%,100% { transform:translateY(-5px) scale(.975); } 50% { transform:translateY(5px) scale(.975); } }
+@keyframes cover-pop { from { opacity: 0; } to { opacity: 1; } }
+@media (prefers-reduced-motion:reduce) { .screen .art img { animation:none!important; } }
 .screen::after { content: ""; position: absolute; inset: 0; z-index: 1; background: linear-gradient(to bottom, rgba(0,0,0,.2), rgba(0,0,0,0) 22%, rgba(0,0,0,0) 46%, rgba(0,0,0,.62)); pointer-events: none; }
-.status { position: absolute; z-index: 5; top: 12px; left: 16px; right: 105px; display: flex; align-items: center; justify-content: space-between; font-size: 13px; font-weight: 600; color: #fff; text-shadow: 0 1px 6px rgba(0,0,0,.4); pointer-events: none; }
+.status { position: absolute; z-index: 22; top: 11px; left: 15px; right: auto; display: flex; align-items: center; justify-content: flex-start; gap:9px; padding:6px 10px; border:1px solid rgba(255,255,255,.24); border-radius:99px; background:rgba(8,9,12,.82); -webkit-backdrop-filter:blur(14px); backdrop-filter:blur(14px); box-shadow:0 2px 10px rgba(0,0,0,.24); font-size: 12px; font-weight: 600; color: #fff; text-shadow: 0 1px 6px rgba(0,0,0,.4); pointer-events: none; }
+.status-right { display:flex; align-items:center; gap:4px; height:15px; margin-left:auto; }
+.status-right .battery-icon { display:block; width:25px; height:13px; flex:none; }
+.status-right .battery-icon[hidden] { display:none; }
+.status-right .battery-icon > rect:first-child { fill:none; stroke:currentColor; stroke-width:1.5; }
+.status-right .battery-level { fill:currentColor; }
+.status-right .battery-icon.is-charging { color:#35d06a; }
 .wordmark { transition: opacity .35s, transform .35s; }
 body.idle .wordmark { opacity: 0; transform: translateY(-5px); }
-.cover-actions { position:absolute; z-index:8; top:10px; right:12px; display:flex; gap:8px; transition:opacity .35s, transform .35s; }
-.cover-actions .pbtn { width:38px; height:38px; background:rgba(15,15,20,.38); color:#fff; border:1px solid rgba(255,255,255,.28); box-shadow:0 5px 18px rgba(0,0,0,.2); -webkit-backdrop-filter:blur(16px); backdrop-filter:blur(16px); }
+.cover-actions { position:absolute; z-index:8; top:42px; right:12px; display:flex; gap:8px; transition:opacity .35s, transform .35s; }
+.cover-actions .pbtn { width:38px; height:38px; background:rgba(12,12,16,.78); color:#fff; border:1px solid rgba(255,255,255,.78); box-shadow:0 3px 12px rgba(0,0,0,.55), inset 0 1px rgba(255,255,255,.16); -webkit-backdrop-filter:blur(16px); backdrop-filter:blur(16px); }
 body.idle .cover-actions { opacity:0; transform:translateY(-6px); pointer-events:none; }
-.settings-pop { position:absolute; z-index:9; top:56px; right:12px; display:flex; flex-direction:column; gap:8px; padding:10px; border-radius:18px; opacity:0; visibility:hidden; transform:translateY(-6px) scale(.97); transition:.2s; }
+.settings-pop { position:absolute; z-index:9; top:88px; right:12px; display:flex; flex-direction:column; gap:8px; padding:10px; border-radius:18px; opacity:0; visibility:hidden; transform:translateY(-6px) scale(.97); transition:opacity .22s ease, visibility .22s ease, transform .22s ease; }
 .settings-pop.open { opacity:1; visibility:visible; transform:none; }
-.settings-pop .chip { text-align:left; }
+.settings-pop .chip { text-align:left; white-space:normal; }
 .meta { position: absolute; z-index: 2; left: 14px; right: 14px; bottom: 12px; color: #fff; padding: 14px 15px 10px; border: 1px solid rgba(255,255,255,.15); border-radius: 22px; background: linear-gradient(140deg, rgba(35,35,43,.58), rgba(12,12,18,.48)); -webkit-backdrop-filter: blur(22px) saturate(1.65); backdrop-filter: blur(22px) saturate(1.65); box-shadow: inset 0 1px rgba(255,255,255,.12), 0 12px 28px rgba(0,0,0,.22); }
 .meta h1 { margin: 0; font-size: 26px; line-height: 1.1; font-weight: 700; letter-spacing: -.01em; text-wrap: balance; text-shadow: 0 1px 10px rgba(0,0,0,.4); overflow-wrap: anywhere; }
 .meta p { margin: 4px 0 12px; font-size: 15px; color: rgba(255,255,255,.78); overflow-wrap: anywhere; }
@@ -184,7 +202,7 @@ body.idle .cover-actions { opacity:0; transform:translateY(-6px); pointer-events
   touch-action: none; user-select: none; -webkit-user-select: none; cursor: grab;
 }
 .wheel.turning { cursor: grabbing; }
-.wheel > button { position: absolute; border: 0; background: none; padding: 0; cursor: pointer; color: var(--wheel-icon); display: grid; place-items: center; width: 56px; height: 56px; border-radius: 50%; transition: color .15s, transform .4s var(--spring); }
+.wheel > button { position: absolute; border: 0; background: none; padding: 0; cursor: pointer; color: var(--wheel-icon); display: grid; place-items: center; width: 56px; height: 56px; border-radius: 50%; transition: color .15s, transform .4s var(--spring), opacity .18s ease; }
 .wheel > button:hover { color: var(--wheel-icon-hi); }
 .wheel > button:active { transform: scale(.86); }
 .wheel > button.on { color: var(--accent); }
@@ -237,6 +255,9 @@ body.is-playing .cf-item.center .cf-box { animation: float 5.5s ease-in-out infi
 .ftools .pbtn { width: 40px; height: 40px; }
 .ftools .pbtn svg { width: 20px; height: 20px; }
 .ftools .tools { gap: 8px; }
+body[data-view="flow"] .ftools .cover-actions { position:static; gap:8px; opacity:1; transform:none; pointer-events:auto; }
+body[data-view="flow"] .ftools .cover-actions .pbtn { width:40px; height:40px; }
+body[data-view="flow"] .ftools .settings-pop { top:48px; right:0; max-height:calc(100dvh - 100px); }
 .fctl { position: absolute; z-index: 6; left: 0; right: 0; bottom: 0; padding: 0 28px 14px; display: flex; flex-direction: column; gap: 4px; color: #fff; transition: opacity .3s; }
 body.lib-open .fctl { opacity: 0; pointer-events: none; }
 .scrub { display: flex; align-items: center; gap: 10px; font-size: 12.5px; font-variant-numeric: tabular-nums; color: rgba(255,255,255,.8); }
@@ -260,7 +281,7 @@ body.lib-open .fctl { opacity: 0; pointer-events: none; }
 
 /* Biblioteca: tela de lista */
 .lib {
-  position: absolute; inset: 0; z-index: 4; display: flex; flex-direction: column; overflow: hidden;
+  position: absolute; inset: 0; z-index: 12; display: flex; flex-direction: column; overflow: hidden;
   background: var(--lib-bg); color: var(--lib-fg); border-radius: inherit;
   opacity: 0; visibility: hidden; transform: scale(.97);
   transition: opacity .35s ease, transform .5s var(--ease), visibility .35s;
@@ -306,8 +327,8 @@ body[data-view="flow"] #libClose { display: none; }
 .lib-foot { flex: none; display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 8px 16px 14px 20px; font-size: 12.5px; color: var(--lib-muted); }
 .lib-foot span { min-width: 0; line-height: 1.35; }
 
-.toast { position: fixed; z-index: 30; top: calc(14px + env(safe-area-inset-top, 0px)); left: 50%; max-width: min(92vw, 420px); padding: 11px 18px; border-radius: 99px; font-size: 14px; font-weight: 500; text-align: center; transform: translate(-50%, -150%); transition: transform .55s var(--spring); }
-.toast.show { transform: translate(-50%, 0); }
+.toast { position: absolute; z-index: 30; top: auto; bottom: clamp(88px, 16%, 132px); left: 50%; max-width: min(92%, 420px); padding: 11px 18px; border-radius: 18px; font-size: 14px; font-weight: 500; text-align: center; pointer-events:none; opacity:0; transform: translate(-50%, 12px); transition: transform .35s ease, opacity .25s ease; }
+.toast.show { opacity:1; transform: translate(-50%, 0); }
 .dropmask { position: fixed; inset: 0; z-index: 40; display: none; place-items: center; background: rgba(0,0,0,.55); color: #fff; font-size: 20px; font-weight: 600; }
 .dropmask.on { display: grid; }
 
@@ -321,9 +342,25 @@ body[data-view="flow"] #libClose { display: none; }
 .stream-results { display:grid; gap:8px; margin-top:14px; }
 .stream-result { display:flex; align-items:center; justify-content:space-between; gap:12px; padding:11px; border-radius:14px; background:var(--lib-field); }
 .stream-result small { display:block; color:var(--muted); overflow-wrap:anywhere; }
-.video-dialog { position:fixed; z-index:70; inset:0; background:#000; display:none; place-items:center; }
+.video-dialog { position:absolute; z-index:70; inset:0; background:#000; display:none; place-items:center; }
 .video-dialog.open { display:grid; }
-.video-dialog video { width:100%; height:100%; max-height:100dvh; object-fit:contain; }
+.video-stage { position:absolute; inset:0; display:grid; place-items:center; overflow:hidden; }
+.video-dialog video { width:100%; height:100%; max-height:100%; object-fit:contain; }
+.video-dialog:fullscreen,.video-dialog:-webkit-full-screen { position:fixed; inset:0; width:100%; height:100%; max-width:none; max-height:none; border-radius:0; }
+.video-dialog:fullscreen video,.video-dialog:-webkit-full-screen video { max-height:100dvh; }
+@media (orientation:portrait) {
+  .video-dialog.force-landscape .video-stage {
+    inset:auto;
+    top:50%;
+    left:50%;
+    right:auto;
+    bottom:auto;
+    width:100dvh;
+    height:100dvw;
+    transform:translate(-50%,-50%) rotate(90deg);
+  }
+  .video-dialog.force-landscape .video-stage video { width:100%; height:100%; max-height:none; }
+}
 .video-close { position:absolute; z-index:2; top:max(16px,env(safe-area-inset-top)); right:16px; width:42px; height:42px; border:1px solid #ffffff55; border-radius:50%; color:#fff; background:#111a; font-size:26px; }
 .video-caption { position:absolute; z-index:2; left:16px; bottom:max(20px,env(safe-area-inset-bottom)); color:#fff; text-shadow:0 1px 8px #000; pointer-events:none; }
 .video-fullscreen { position:absolute; z-index:3; right:16px; bottom:max(18px,env(safe-area-inset-bottom)); }
@@ -343,12 +380,11 @@ html,body{min-height:100%;height:100%;overflow:hidden}body{background:var(--bg)}
 .screen{flex:1 1 0;min-height:0;aspect-ratio:auto;border-radius:clamp(20px,4.5vw,32px)}
 .body{flex:0 0 clamp(174px,29svh,246px);height:clamp(174px,29svh,246px);min-height:0;padding:6px 0;border-radius:clamp(20px,4.5vw,32px)}
 .wheel{width:min(min(230px,64vw),calc(29svh - 12px));max-width:100%}
-.status{right:16px;justify-content:flex-start}.wordmark{display:none!important}
+.status{left:12px;right:auto;justify-content:flex-start}.wordmark{display:none!important}
 .meta{left:12px;right:12px;bottom:10px;padding:10px 12px 8px;border-radius:18px}
 .meta h1{font-size:clamp(17px,4.7vw,21px);line-height:1.12}.meta p{margin:3px 0 6px;font-size:13px}
 .times{font-size:11px}.bar{height:18px}.cover-actions{top:9px;right:9px}.cover-actions .pbtn{width:34px;height:34px}
 .settings-pop{max-width:min(270px,calc(100vw - 36px))}.settings-pop .chip{font-size:12px;padding:8px 11px}.chip:disabled{opacity:.55}
-body.has-track .screen .art img{animation:kb 22s ease-in-out infinite alternate}
 @media(max-height:700px){.body{flex-basis:clamp(150px,26svh,190px);height:clamp(150px,26svh,190px)}.wheel{width:min(min(180px,56vw),calc(26svh - 10px))}.meta h1{font-size:17px}.meta p{font-size:12px;margin-bottom:4px}}
 @media(max-height:560px) and (orientation:portrait){.app{gap:4px;padding-top:3px;padding-bottom:3px}.body{flex-basis:126px;height:126px}.wheel{width:120px}.wheel>button{transform:scale(.78)}}
 
@@ -387,7 +423,7 @@ body.has-track .screen .art img{animation:kb 22s ease-in-out infinite alternate}
   .wheel > button.center svg { width:34px;height:34px; }
   .status { top:14px; left:18px; color:#fff; }
   .cover-actions { top:12px; right:12px; }
-  .cover-actions .pbtn { background:rgba(0,0,0,.24); }
+  .cover-actions .pbtn { background:rgba(12,12,16,.78); }
   .hint { display:none; }
 }
 @media (max-width: 760px) and (max-height: 720px) and (orientation: portrait) {
@@ -430,28 +466,28 @@ html, body { background:#101115; }
 body {
   background:
     radial-gradient(ellipse at 50% 34%, #34363d 0%, #1b1c21 43%, #0b0c0f 100%);
+  padding:0;
   overscroll-behavior:none;
 }
 .app {
   max-width:460px;
   padding: max(12px,env(safe-area-inset-top)) max(14px,env(safe-area-inset-right)) max(12px,env(safe-area-inset-bottom)) max(14px,env(safe-area-inset-left));
-  filter:drop-shadow(0 24px 38px rgba(0,0,0,.38));
 }
 .device {
   position:relative;
   isolation:isolate;
   padding:10px;
   gap:12px;
-  border-radius:clamp(34px,8vw,48px);
-  border:1px solid rgba(255,255,255,.78);
+  border-radius:clamp(38px,9vw,54px);
+  border:1px solid rgba(255,255,255,.42);
   background:
-    linear-gradient(112deg,rgba(255,255,255,.95) 0%,rgba(177,180,187,.95) 2%,rgba(247,248,250,.98) 7%,rgba(177,180,187,.98) 11%,rgba(235,236,239,.98) 48%,rgba(153,156,164,.98) 94%,rgba(246,247,249,.98) 100%);
+    linear-gradient(112deg,#090a0d 0%,#4a4b50 2%,#111216 7%,#08090c 50%,#34353a 96%,#090a0d 100%);
   box-shadow:
-    0 2px 3px rgba(255,255,255,.6),
-    0 8px 20px rgba(0,0,0,.28),
-    inset 0 0 0 1px rgba(65,67,74,.42),
-    inset 0 2px 3px rgba(255,255,255,.9),
-    inset 0 -5px 12px rgba(60,62,70,.24);
+    0 2px 3px rgba(255,255,255,.14),
+    0 12px 30px rgba(0,0,0,.5),
+    inset 0 0 0 1px rgba(255,255,255,.08),
+    inset 0 2px 3px rgba(255,255,255,.16),
+    inset 0 -5px 12px rgba(0,0,0,.48);
 }
 .device::before,
 .device::after {
@@ -459,24 +495,27 @@ body {
   position:absolute;
   z-index:-1;
   width:4px;
-  border:1px solid rgba(255,255,255,.48);
-  background:linear-gradient(90deg,#777a81,#e8e9ec,#92959c);
+  border:1px solid rgba(255,255,255,.18);
+  background:linear-gradient(90deg,#222329,#74767d,#27282e);
   box-shadow:0 1px 3px rgba(0,0,0,.38);
   pointer-events:none;
 }
 .device::before {
   left:-5px; top:19%; height:52px; border-radius:4px 0 0 4px;
-  box-shadow:0 1px 3px rgba(0,0,0,.38),0 78px 0 -1px #bfc1c6,0 78px 2px 0 rgba(0,0,0,.3);
+  box-shadow:0 1px 3px rgba(0,0,0,.38),0 78px 0 -1px #4c4e55,0 78px 2px 0 rgba(0,0,0,.3);
 }
 .device::after {
   right:-5px; top:45%; height:82px; border-radius:0 4px 4px 0;
 }
 .screen {
-  border:1px solid rgba(255,255,255,.18);
+  border:1px solid rgba(255,255,255,.12);
   box-shadow:inset 0 0 0 1px rgba(0,0,0,.25),0 2px 5px rgba(0,0,0,.2);
 }
+body:not(.has-track) .screen {
+  background:linear-gradient(145deg,#272832,#101116);
+}
 .body {
-  border:1px solid rgba(255,255,255,.9);
+  border:1px solid rgba(255,255,255,.78);
   box-shadow:inset 0 1px 0 rgba(255,255,255,.96),inset 0 -2px 5px rgba(0,0,0,.08),0 1px 3px rgba(0,0,0,.12);
 }
 .wheel {
@@ -486,7 +525,7 @@ body {
 .wheel > button:active { filter:brightness(.88); }
 @media (max-width:760px) and (orientation:portrait) {
   .app { padding-left:max(18px,env(safe-area-inset-left)); padding-right:max(18px,env(safe-area-inset-right)); }
-  .device { padding:9px; gap:10px; border-radius:clamp(34px,9vw,46px); }
+  .device { padding:9px; gap:10px; border-radius:clamp(38px,10vw,50px); }
   .screen { border-radius:clamp(24px,6vw,34px); }
   .body { border-radius:clamp(24px,6vw,34px); }
 }
@@ -497,14 +536,175 @@ body {
   .device,.screen,.body,.wheel > button { transition:none!important; }
 }
 
+/* Conteúdo da tela e controles estáveis no toque. */
+.settings-pop {
+  width:min(270px,calc(100vw - 36px));
+  max-height:calc(100% - 100px);
+  overflow-y:auto;
+  overscroll-behavior:contain;
+  scrollbar-width:thin;
+}
+.settings-pop .select-chip {
+  display:block;
+  width:100%;
+  border-radius:14px;
+  white-space:normal;
+  line-height:1.35;
+  cursor:default;
+}
+.setting-select {
+  display:block;
+  width:100%;
+  min-width:0;
+  max-width:100%;
+  margin-top:7px;
+  padding:8px;
+  border:0;
+  border-radius:9px;
+  background:var(--lib-field);
+  color:var(--lib-fg);
+  font:inherit;
+}
+.wheel > button {
+  z-index:1;
+  width:clamp(36px,22%,56px);
+  height:clamp(36px,22%,56px);
+  margin:0;
+}
+.b-top { top:2%; left:50%; }
+.b-bot { bottom:2%; left:50%; }
+.b-left { left:2%; top:50%; }
+.b-right { right:2%; top:50%; }
+.wheel > button.b-top,
+.wheel > button.b-bot { transform:translateX(-50%); }
+.wheel > button.b-left,
+.wheel > button.b-right { transform:translateY(-50%); }
+.wheel > button.center { z-index:2; width:34%; height:34%; margin:0; transform:translate(-50%,-50%); }
+.wheel > button.b-top:active,
+.wheel > button.b-bot:active { transform:translateX(-50%); }
+.wheel > button.b-left:active,
+.wheel > button.b-right:active { transform:translateY(-50%); }
+.wheel > button.center:active { transform:translate(-50%,-50%); }
+.wheel > button:active { filter:brightness(.88); }
+.wheel > button:active svg { transform:scale(.88); }
+.wheel > button svg { transition:transform .18s ease; }
+@media (max-width:760px) and (orientation:portrait) {
+  .cover-actions { top:42px; }
+  .meta {
+    isolation:isolate;
+    background:transparent;
+    -webkit-backdrop-filter:none;
+    backdrop-filter:none;
+  }
+  .meta::before {
+    content:"";
+    position:absolute;
+    z-index:0;
+    inset:-30px -8px -8px;
+    pointer-events:none;
+    background:linear-gradient(to bottom,rgba(24,25,30,.04),rgba(27,28,34,.34) 30%,rgba(27,28,34,.78) 100%);
+    -webkit-backdrop-filter:blur(26px) saturate(1.7);
+    backdrop-filter:blur(26px) saturate(1.7);
+    -webkit-mask-image:linear-gradient(to bottom,transparent 0%,rgba(0,0,0,.24) 13%,#000 37%);
+    mask-image:linear-gradient(to bottom,transparent 0%,rgba(0,0,0,.24) 13%,#000 37%);
+  }
+  .meta > * { position:relative; z-index:1; }
+  body.welcome-mode .meta .bar,
+  body.welcome-mode .meta .times { display:none; }
+  .screen .art::before { opacity:.86; }
+  .screen .art img { object-fit:cover; }
+}
+.standby {
+  position:absolute;
+  z-index:20;
+  inset:0;
+  display:grid;
+  place-items:center;
+  overflow:auto;
+  padding:max(20px,env(safe-area-inset-top)) max(16px,env(safe-area-inset-right)) max(20px,env(safe-area-inset-bottom)) max(16px,env(safe-area-inset-left));
+  color:#fff;
+  background:#101216;
+  isolation:isolate;
+  opacity:0;
+  visibility:hidden;
+  pointer-events:none;
+  transition:opacity .42s ease,visibility .42s ease;
+}
+.standby[hidden] { display:none; }
+.standby.is-visible { opacity:1; visibility:visible; pointer-events:auto; }
+.standby-photo { position:absolute; z-index:-2; inset:0; width:100%; height:100%; object-fit:cover; }
+.standby::before { content:""; position:absolute; z-index:-1; inset:0; background:linear-gradient(180deg,rgba(0,0,0,.4),rgba(0,0,0,.12) 42%,rgba(0,0,0,.72)); }
+.standby.animated-gradient { background:linear-gradient(135deg,#102b38,#332147 48%,#112b36); }
+.standby.animated-gradient .standby-photo { display:none; }
+.standby.animated-gradient::before {
+  inset:-22%;
+  opacity:.88;
+  filter:blur(34px) saturate(1.35);
+  background:
+    radial-gradient(ellipse at 18% 28%,rgba(31,196,181,.86),transparent 40%),
+    radial-gradient(ellipse at 78% 24%,rgba(133,92,205,.82),transparent 42%),
+    radial-gradient(ellipse at 68% 82%,rgba(236,93,131,.72),transparent 43%),
+    radial-gradient(ellipse at 24% 76%,rgba(66,126,207,.76),transparent 42%);
+  animation:standby-gradient-drift 24s ease-in-out infinite alternate;
+}
+.standby.animated-gradient::after { content:""; position:absolute; z-index:-1; inset:0; pointer-events:none; background:linear-gradient(180deg,rgba(0,0,0,.24),rgba(0,0,0,.06) 42%,rgba(0,0,0,.55)); }
+@keyframes standby-gradient-drift { from { transform:translate3d(-2%,1%,0) scale(.98) rotate(-2deg); } to { transform:translate3d(2%,-1%,0) scale(1.04) rotate(2deg); } }
+@media (prefers-reduced-motion:reduce) { .standby.animated-gradient::before { animation:none; } }
+.standby-content { position:relative; z-index:1; width:min(100%,680px); display:grid; justify-items:center; gap:clamp(12px,3vh,24px); text-align:center; text-shadow:0 2px 18px rgba(0,0,0,.6); }
+.standby-clock { font-size:clamp(64px,18vw,148px); font-weight:300; letter-spacing:-.07em; line-height:.95; font-variant-numeric:tabular-nums; }
+.standby-date { margin-top:-8px; font-size:clamp(16px,3vw,23px); font-weight:500; }
+.standby-weather { min-height:24px; font-size:clamp(14px,2.4vw,18px); }
+.standby-tap-hint { margin:0; font-size:12px; color:rgba(255,255,255,.8); }
+@media (max-height:520px) {
+  .standby-content { gap:8px; }
+  .standby-clock { font-size:clamp(52px,20vh,86px); }
+  .standby-date,.standby-weather { font-size:14px; }
+  .standby-tap-hint { display:none; }
+}
+.onboarding {
+  position:fixed;
+  z-index:100;
+  inset:0;
+  display:grid;
+  place-items:center;
+  overflow:auto;
+  padding:max(18px,env(safe-area-inset-top)) max(14px,env(safe-area-inset-right)) max(18px,env(safe-area-inset-bottom)) max(14px,env(safe-area-inset-left));
+  background:radial-gradient(ellipse at 50% 20%,#363840,#121317 72%);
+  color:#fff;
+}
+.onboarding[hidden] { display:none; }
+.onboarding-panel {
+  width:min(100%,520px);
+  max-height:100%;
+  overflow:auto;
+  padding:clamp(20px,5vw,34px);
+  border:1px solid rgba(255,255,255,.16);
+  border-radius:28px;
+  background:rgba(22,23,29,.92);
+  box-shadow:0 24px 70px rgba(0,0,0,.42);
+  -webkit-backdrop-filter:blur(24px);
+  backdrop-filter:blur(24px);
+}
+.onboarding-mark { display:block; width:64px; height:64px; margin:0 auto 16px; border-radius:18px; }
+.onboarding-panel h1 { margin:0; text-align:center; font-size:clamp(25px,7vw,34px); letter-spacing:-.04em; }
+.onboarding-lead { margin:8px 0 22px; color:rgba(255,255,255,.74); text-align:center; line-height:1.5; }
+.onboarding-card { margin-top:12px; padding:15px; border:1px solid rgba(255,255,255,.12); border-radius:18px; background:rgba(255,255,255,.055); }
+.onboarding-card h2 { margin:0 0 6px; font-size:16px; }
+.onboarding-card p { margin:0; color:rgba(255,255,255,.72); font-size:13px; line-height:1.5; }
+.onboarding-actions { display:grid; gap:9px; margin-top:12px; }
+.onboarding .chip { width:100%; min-height:44px; color:#fff; background:rgba(255,255,255,.13); text-align:center; white-space:normal; }
+.onboarding .chip.primary { border:0; background:#fff; color:#17181d; }
+.onboarding .chip:disabled { opacity:.45; cursor:not-allowed; }
+.onboarding-state { min-height:18px; margin-top:8px!important; color:rgba(255,255,255,.82)!important; }
+.onboarding-foot { margin:14px 0 0; color:rgba(255,255,255,.55); font-size:11px; line-height:1.45; text-align:center; }
+
 </style>
 
-<svg aria-hidden="true" width="0" height="0" style="position:absolute"><filter id="sphere-liquid" x="-15%" y="-15%" width="130%" height="130%"><feTurbulence type="fractalNoise" baseFrequency=".012 .028" numOctaves="2" seed="7" result="noise"><animate attributeName="baseFrequency" dur="8s" values=".008 .02;.018 .035;.008 .02" repeatCount="indefinite"/></feTurbulence><feDisplacementMap in="SourceGraphic" in2="noise" scale="13" xChannelSelector="R" yChannelSelector="G"><animate attributeName="scale" dur="7s" values="7;17;7" repeatCount="indefinite"/></feDisplacementMap></filter></svg>
 <main class="app">
   <section class="device" id="device">
     <div class="screen" id="screen" aria-label="Tocando agora">
-      <div class="art"><img id="artImg" alt=""></div>
-      <div class="cover-actions">
+      <div class="art"><img id="artImg" alt=""><video id="coverVideo" muted loop playsinline aria-hidden="true"></video></div>
+      <div class="cover-actions" id="coverActions">
         <button class="pbtn" id="bLib" aria-label="Biblioteca" aria-pressed="false" title="Biblioteca"><svg viewBox="0 0 24 24"><path d="M3 6h13v2H3V6zm0 5h13v2H3v-2zm0 5h8v2H3v-2zM19 4v10.3A3 3 0 1 0 21 17V7h-2V4z"/></svg></button>
         <button class="pbtn" id="bSettings" aria-label="Configurações" title="Mais opções"><svg viewBox="0 0 24 24"><circle cx="5" cy="12" r="1.8"/><circle cx="12" cy="12" r="1.8"/><circle cx="19" cy="12" r="1.8"/></svg></button>
       </div>
@@ -512,16 +712,34 @@ body {
         <button class="chip" id="bAdd">Adicionar áudio ou vídeo</button>
         <button class="chip" id="bStream">Reproduzir por link</button>
         <button class="chip" id="bScan">Escanear músicas e buscar capas</button>
+        <a class="chip" href="https://applemusic.aritra.ovh/" target="_blank" rel="noopener noreferrer">Obter arte animada na web</a>
+        <button class="chip" id="bAnimatedCover">Definir capa animada (GIF/WebP/vídeo)</button>
+        <button class="chip" id="bRemoveAnimatedCover" hidden>Remover capa animada</button>
         <button class="chip" id="bTheme">Tema: Escuro</button>
-        <label class="chip motion-setting" for="motionMode">Movimento da capa
-          <select id="motionMode" aria-label="Movimento da capa" style="display:block;width:100%;margin-top:7px;padding:7px;border:0;border-radius:9px;background:var(--lib-field);color:var(--lib-fg);font:inherit">
-            <option value="auto">Automático (capas reconhecidas)</option><option value="liquid">Fluidez líquida</option><option value="tear">Lágrima</option><option value="float">Flutuação em camadas</option><option value="off">Desativado</option>
+        <button class="chip" id="bChooseStandbyPhoto">Foto da tela de descanso</button>
+        <button class="chip" id="bRemoveStandbyPhoto" hidden>Remover foto da tela de descanso</button>
+        <label class="chip select-chip" for="standbyBackground">Fundo da tela de descanso
+          <select class="setting-select" id="standbyBackground" aria-label="Fundo da tela de descanso">
+            <option value="photo">Foto ou fundo escuro</option>
+            <option value="animated-gradient">Degradê animado com blur</option>
+          </select>
+        </label>
+        <button class="chip" id="bStandbyWeather">Permitir localização e clima</button>
+        <button class="chip" id="standbyEnableSensors">Ativar detecção de superfície</button>
+        <label class="chip select-chip" for="motionMode">Movimento da capa
+          <select class="setting-select" id="motionMode" aria-label="Movimento da capa">
+            <option value="zoom">Zoom suave</option><option value="float">Flutuação em camadas</option><option value="off">Desativado</option>
           </select>
         </label>
         <button class="chip" id="bView">Alternar visualização</button>
         <button class="chip" id="bShuffle2">Reprodução aleatória</button>
       </div>
-      <div class="status"><span id="clock">9:41</span></div>
+      <div class="status">
+        <span id="clock">9:41</span>
+        <span class="status-right" aria-hidden="true">
+          <svg class="battery-icon" id="batteryIcon" viewBox="0 0 28 14" role="img" aria-label="Bateria" hidden><rect x="1" y="2" width="22" height="10" rx="3"/><path d="M25 5v4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><rect class="battery-level" id="batteryLevel" x="3" y="4" width="17" height="6" rx="1.5"/></svg>
+        </span>
+      </div>
       <div class="vol glass" id="vol" aria-live="polite"><span>Volume</span><i><b id="volfill"></b></i></div>
       <div class="meta">
         <h1 id="title">Sua música começa aqui</h1>
@@ -532,6 +750,24 @@ body {
         </div>
         <div class="times"><span class="js-tcur">0:00</span><span class="js-trem">-0:00</span></div>
       </div>
+      <section class="standby" id="standby" aria-label="Tela de descanso. Toque para voltar." aria-hidden="true" hidden>
+        <img class="standby-photo" id="standbyPhoto" alt="">
+        <div class="standby-content">
+          <div class="standby-clock" id="standbyClock" aria-label="Horário">--:--</div>
+          <div class="standby-date" id="standbyDate"></div>
+          <div class="standby-weather" id="standbyWeather">Clima indisponível</div>
+          <p class="standby-tap-hint">Toque em qualquer lugar para voltar</p>
+        </div>
+      </section>
+      <div class="toast glass" id="toast" role="status" aria-live="polite"></div>
+      <section class="video-dialog" id="videoDialog" aria-hidden="true">
+        <div class="video-stage" id="videoStage">
+          <button class="video-close" id="videoClose" aria-label="Fechar vídeo">×</button>
+          <video id="videoPlayer" controls playsinline></video>
+          <div class="video-caption" id="videoCaption"></div>
+          <button class="chip video-fullscreen" id="videoFullscreen">Tela cheia</button>
+        </div>
+      </section>
     </div>
 
     <div class="body">
@@ -574,6 +810,42 @@ body {
   <p class="hint">Gire a roda para mudar o volume. Na biblioteca, a roda percorre a lista e o botão central toca a faixa. Suas músicas ficam salvas neste navegador e tocam sem internet.</p>
 </main>
 
+<section class="onboarding" id="onboarding" role="dialog" aria-modal="true" aria-labelledby="onboardingTitle" aria-describedby="onboardingLead" hidden>
+  <div class="onboarding-panel">
+    <img class="onboarding-mark" src="./assets/spherepod-icon-192.png" alt="">
+    <h1 id="onboardingTitle">Bem-vindo ao SpherePod</h1>
+    <p class="onboarding-lead" id="onboardingLead">Configure o que quiser antes de começar. Suas músicas ficam neste dispositivo e podem tocar sem internet.</p>
+    <section class="onboarding-card" aria-labelledby="onboardingPrivacyTitle">
+      <h2 id="onboardingPrivacyTitle">Termos, privacidade e armazenamento</h2>
+      <p>Ao aceitar, você concorda que o SpherePod guarde preferências no armazenamento local e as músicas que escolher no IndexedDB deste navegador. O app não cria cookies de publicidade. Se autorizar localização, as coordenadas serão enviadas à Open-Meteo para consultar o clima. A localização e a importação são opcionais.</p>
+      <div class="onboarding-actions">
+        <button class="chip primary" id="onboardingAccept">Aceitar termos e cookies</button>
+      </div>
+      <p class="onboarding-state" id="onboardingConsentState" aria-live="polite">Necessário para continuar.</p>
+    </section>
+    <section class="onboarding-card" aria-labelledby="onboardingLocationTitle">
+      <h2 id="onboardingLocationTitle">Localização e clima (opcional)</h2>
+      <p>Peça autorização do navegador para obter sua localização aproximada e consultar a previsão. O SpherePod não guarda as coordenadas.</p>
+      <div class="onboarding-actions">
+        <button class="chip" id="onboardingLocation" disabled>Autorizar localização e GPS</button>
+      </div>
+      <p class="onboarding-state" id="onboardingLocationState" aria-live="polite">Você também pode configurar isso depois.</p>
+    </section>
+    <section class="onboarding-card" aria-labelledby="onboardingMusicTitle">
+      <h2 id="onboardingMusicTitle">Importar músicas (opcional)</h2>
+      <p>Escolha arquivos de áudio. O navegador só permite acesso aos arquivos selecionados; eles são copiados para o armazenamento local do SpherePod e ficam disponíveis offline neste dispositivo.</p>
+      <div class="onboarding-actions">
+        <button class="chip" id="onboardingImport" disabled>Escolher músicas do dispositivo</button>
+      </div>
+      <p class="onboarding-state" id="onboardingImportState" aria-live="polite">Você também pode importar depois pela biblioteca.</p>
+    </section>
+    <div class="onboarding-actions">
+      <button class="chip primary" id="onboardingContinue" disabled>Continuar para o SpherePod</button>
+    </div>
+    <p class="onboarding-foot">As músicas ficam limitadas à cota de armazenamento do navegador e podem ser removidas pelo usuário ou pelo sistema.</p>
+  </div>
+</section>
+
 <section class="lib" id="lib" aria-hidden="true" aria-label="Biblioteca">
   <header class="lib-head">
     <div class="lib-top">
@@ -588,22 +860,17 @@ body {
   <footer class="lib-foot"><span id="libStore"></span><button class="chip" id="libAdd">Adicionar</button></footer>
 </section>
 
-<div class="toast glass" id="toast" role="status"></div>
 <div class="dropmask" id="dropmask">Solte para adicionar à biblioteca</div>
 <input type="file" id="file" accept="audio/*,video/*,.mp3,.m4a,.aac,.flac,.wav,.ogg,.opus,.mp4,.m4v,.mov,.webm,.ogv,.mkv" multiple hidden>
+<input type="file" id="onboardingAudioFile" accept="audio/*,.mp3,.m4a,.aac,.flac,.wav,.ogg,.opus,.oga,.weba" multiple hidden>
+<input type="file" id="animatedCoverFile" accept="image/gif,image/webp,video/mp4,video/webm,.gif,.webp,.mp4,.webm,.mov,.m4v" hidden>
+<input type="file" id="standbyPhotoFile" accept="image/*" hidden>
 <section class="stream-dialog glass" id="streamDialog" aria-hidden="true">
   <div class="stream-head"><strong>Transmitir por link</strong><button class="pbtn sm" id="streamClose" aria-label="Fechar">×</button></div>
   <p>Cole o endereço de uma página. O SpherePod procura vídeos públicos identificáveis no HTML e nos links acessíveis.</p>
   <form id="streamForm"><input id="streamUrl" type="url" placeholder="https://site.com/pagina" required><button class="chip" type="submit" id="streamScan">Procurar vídeos</button></form>
   <div id="streamResults" class="stream-results" aria-live="polite"></div>
 </section>
-<section class="video-dialog" id="videoDialog" aria-hidden="true">
-  <button class="video-close" id="videoClose" aria-label="Fechar vídeo">×</button>
-  <video id="videoPlayer" controls playsinline></video>
-  <div class="video-caption" id="videoCaption"></div>
-  <button class="chip video-fullscreen" id="videoFullscreen">Tela cheia</button>
-</section>
-
 <script>
 (function () {
   var $ = function (id) { return document.getElementById(id); };
@@ -615,11 +882,6 @@ body {
   var imported = [], list = [];
   var cur = 0, focus = 0, pos = 0, playing = false, shuffle = false, volume = 0.6;
 
-  function h(n) {
-    n = Math.imul(n ^ (n >>> 15), 2246822507);
-    n = Math.imul(n ^ (n >>> 13), 3266489909);
-    return ((n ^ (n >>> 16)) >>> 0) / 4294967296;
-  }
   function strHash(s) { var x = 5381, i; for (i = 0; i < s.length; i++) x = (Math.imul(x, 33) + s.charCodeAt(i)) | 0; return x >>> 0; }
   function fmt(s) { s = Math.max(0, Math.floor(s || 0)); return Math.floor(s / 60) + ":" + String(s % 60).padStart(2, "0"); }
   function fmtBytes(n) {
@@ -627,17 +889,203 @@ body {
     return (n / 1048576).toFixed(n >= 10485760 ? 0 : 1).replace(".", ",") + " MB";
   }
 
-  function artSvg(T) {
-    var hue = T.hue, n = T.petals, p = "", i;
-    for (i = 0; i < n; i++) p += '<ellipse cx="0" cy="-74" rx="40" ry="72" transform="rotate(' + (i * 360 / n) + ')" fill="hsl(' + (hue + i * 7) + ',78%,' + (66 + (i % 2) * 6) + '%)" opacity=".88"/>';
-    var dots = "";
-    for (i = 0; i < 16; i++) {
-      dots += '<circle cx="' + Math.round(h(T.seed + i) * 400) + '" cy="' + Math.round(h(T.seed + 50 + i) * 432) + '" r="' + (4 + Math.round(h(T.seed + 99 + i) * 14)) + '" fill="hsl(' + (hue + 30 + i * 12) + ',85%,78%)" opacity=".55"/>';
+  var activeWeatherText = "Clima indisponível";
+  function renderWelcome(now) {
+    var date = now || new Date();
+    $("standbyClock").textContent = date.toLocaleTimeString("pt-BR", { hour:"2-digit", minute:"2-digit" });
+    $("standbyDate").textContent = date.toLocaleDateString("pt-BR", { weekday:"long", day:"numeric", month:"long" });
+    $("standbyWeather").textContent = activeWeatherText;
+    document.title = $("standbyClock").textContent + " · SpherePod";
+  }
+  var weatherDescriptions = {
+    0:"Céu limpo",1:"Predominantemente limpo",2:"Parcialmente nublado",3:"Nublado",
+    45:"Nevoeiro",48:"Nevoeiro com geada",51:"Garoa leve",53:"Garoa",55:"Garoa intensa",
+    56:"Garoa congelante leve",57:"Garoa congelante intensa",61:"Chuva leve",63:"Chuva",
+    65:"Chuva intensa",66:"Chuva congelante leve",67:"Chuva congelante intensa",71:"Neve leve",
+    73:"Neve",75:"Neve intensa",77:"Grãos de neve",80:"Pancadas leves",81:"Pancadas",
+    82:"Pancadas intensas",85:"Neve em pancadas leves",86:"Neve em pancadas intensas",
+    95:"Trovoadas",96:"Trovoadas com granizo leve",99:"Trovoadas com granizo intenso"
+  };
+  function requestLocationWeather(onResult) {
+    function finish(success, message) {
+      if (typeof onResult === "function") onResult(success, message);
     }
+    if (!navigator.geolocation) {
+      activeWeatherText = "Localização não disponível neste navegador.";
+      $("standbyWeather").textContent = activeWeatherText;
+      $("bStandbyWeather").disabled = true;
+      toast(activeWeatherText);
+      finish(false, activeWeatherText);
+      return;
+    }
+    $("bStandbyWeather").disabled = true;
+    $("standbyWeather").textContent = "Aguardando autorização de localização…";
+    navigator.geolocation.getCurrentPosition(function (position) {
+      var coords = position.coords;
+      var url = "https://api.open-meteo.com/v1/forecast?latitude=" + encodeURIComponent(coords.latitude) +
+        "&longitude=" + encodeURIComponent(coords.longitude) +
+        "&current=temperature_2m,weather_code&timezone=auto";
+      fetch(url).then(function (response) {
+        if (!response.ok) throw new Error("Falha ao consultar o clima.");
+        return response.json();
+      }).then(function (data) {
+        if (!data.current) throw new Error("A resposta do serviço de clima está incompleta.");
+        activeWeatherText = (weatherDescriptions[data.current.weather_code] || "Condição atual") + " · " +
+          Math.round(data.current.temperature_2m) + " °C";
+        $("standbyWeather").textContent = activeWeatherText;
+        $("bStandbyWeather").hidden = true;
+        lsSet("spherepod-weather-optin", "1");
+        finish(true, activeWeatherText);
+      }).catch(function () {
+        activeWeatherText = "Não foi possível carregar o clima.";
+        $("standbyWeather").textContent = activeWeatherText;
+        $("bStandbyWeather").disabled = false;
+        toast(activeWeatherText);
+        finish(false, activeWeatherText);
+      });
+    }, function (error) {
+      $("bStandbyWeather").disabled = false;
+      activeWeatherText = error.code === 1 ? "Permissão de localização negada." : "Localização indisponível.";
+      $("standbyWeather").textContent = activeWeatherText;
+      toast(activeWeatherText + " Você pode tentar novamente.");
+      finish(false, activeWeatherText);
+    }, { enableHighAccuracy:false, timeout:12000, maximumAge:600000 });
+  }
+  $("bStandbyWeather").addEventListener("click", function () {
+    $("settingsPop").classList.remove("open");
+    requestLocationWeather();
+  });
+  var standbyPhotoUrl = "";
+  function setStandbyPhoto(blob) {
+    if (standbyPhotoUrl) URL.revokeObjectURL(standbyPhotoUrl);
+    standbyPhotoUrl = blob ? URL.createObjectURL(blob) : "";
+    if (standbyPhotoUrl) $("standbyPhoto").src = standbyPhotoUrl;
+    else $("standbyPhoto").removeAttribute("src");
+    $("standbyPhoto").hidden = !standbyPhotoUrl;
+    $("bRemoveStandbyPhoto").hidden = !standbyPhotoUrl;
+  }
+  $("bChooseStandbyPhoto").addEventListener("click", function () {
+    $("settingsPop").classList.remove("open");
+    $("standbyPhotoFile").click();
+  });
+  $("standbyPhotoFile").addEventListener("change", function () {
+    var file = $("standbyPhotoFile").files && $("standbyPhotoFile").files[0];
+    $("standbyPhotoFile").value = "";
+    if (!file) return;
+    if (file.type.indexOf("image/") !== 0) { toast("Escolha um arquivo de imagem."); return; }
+    var testUrl = URL.createObjectURL(file), image = new Image();
+    image.onload = function () {
+      URL.revokeObjectURL(testUrl);
+      dbSettingPut("standbyPhoto", file).then(function () {
+        setStandbyPhoto(file);
+        $("settingsPop").classList.remove("open");
+        toast("Foto da tela de descanso salva neste dispositivo.");
+      }).catch(function () { toast("Não foi possível salvar a foto neste navegador."); });
+    };
+    image.onerror = function () { URL.revokeObjectURL(testUrl); toast("Não foi possível abrir esta imagem."); };
+    image.src = testUrl;
+  });
+  $("bRemoveStandbyPhoto").addEventListener("click", function () {
+    dbSettingDel("standbyPhoto").then(function () {
+      setStandbyPhoto(null);
+      toast("Foto removida da tela de descanso.");
+    }).catch(function () { toast("Não foi possível remover a foto."); });
+  });
+  var standbyBackground = lsGet("spherepod-standby-background") || "photo";
+  if (standbyBackground !== "animated-gradient") standbyBackground = "photo";
+  $("standbyBackground").value = standbyBackground;
+  function applyStandbyBackground() {
+    $("standby").classList.toggle("animated-gradient", standbyBackground === "animated-gradient");
+  }
+  $("standbyBackground").addEventListener("change", function () {
+    standbyBackground = $("standbyBackground").value === "animated-gradient" ? "animated-gradient" : "photo";
+    lsSet("spherepod-standby-background", standbyBackground);
+    applyStandbyBackground();
+    $("settingsPop").classList.remove("open");
+    toast(standbyBackground === "animated-gradient" ? "Degradê animado ativado." : "Fundo da tela de descanso atualizado.");
+  });
+  applyStandbyBackground();
+  $("standby").addEventListener("click", hideStandby);
+  document.addEventListener("keydown", function (event) {
+    if ($("standby").hidden) return;
+    if (event.key === "Escape") { hideStandby(); return; }
+  });
+  var standbyHideTimer = 0;
+  function showStandby() {
+    window.clearTimeout(standbyHideTimer);
+    if (!$("onboarding").hidden) return;
+    if (playing || (videoPlayer && !videoPlayer.paused && !videoPlayer.ended)) {
+      scheduleStandby(5000);
+      return;
+    }
+    if (!$("standby").hidden && $("standby").classList.contains("is-visible")) return;
+    renderWelcome();
+    document.body.classList.add("welcome-mode");
+    if ($("standby").hidden) {
+      $("standby").hidden = false;
+      void $("standby").offsetWidth;
+    }
+    $("standby").classList.add("is-visible");
+    $("standby").setAttribute("aria-hidden", "false");
+  }
+  function hideStandby() {
+    if ($("standby").hidden) return;
+    $("standby").classList.remove("is-visible");
+    $("standby").setAttribute("aria-hidden", "true");
+    document.body.classList.remove("welcome-mode");
+    if (list.length) {
+      document.title = list[cur].title + " · SpherePod";
+    } else document.title = "SpherePod — seu player pessoal";
+    window.clearTimeout(standbyHideTimer);
+    standbyHideTimer = window.setTimeout(function () { $("standby").hidden = true; }, 450);
+    scheduleStandby(5000);
+  }
+  var standbyTimer = 0;
+  function scheduleStandby(delay) {
+    window.clearTimeout(standbyTimer);
+    if (!$("onboarding").hidden) return;
+    standbyTimer = window.setTimeout(showStandby, delay);
+  }
+  var flatOrientation = null;
+  var flatSensorReady = false, surfaceSensorListening = false, chargingStandbyTimer = 0, batteryManager = null;
+  function maybeScheduleChargingStandby() {
+    window.clearTimeout(chargingStandbyTimer);
+    if (batteryManager && batteryManager.charging && mq.matches && flatSensorReady && flatOrientation === true) {
+      chargingStandbyTimer = window.setTimeout(showStandby, 3500);
+    }
+  }
+  window.addEventListener("deviceorientation", function (event) {
+    if (typeof event.beta === "number" && typeof event.gamma === "number") {
+      var isFlat = Math.abs(event.beta) < 12 && Math.abs(event.gamma) < 12;
+      flatSensorReady = true;
+      if (isFlat !== flatOrientation) {
+        flatOrientation = isFlat;
+        maybeScheduleChargingStandby();
+      }
+    }
+  }, true);
+  if (!window.DeviceOrientationEvent || typeof window.DeviceOrientationEvent.requestPermission !== "function") {
+    surfaceSensorListening = true;
+  }
+  $("standbyEnableSensors").addEventListener("click", function () {
+    if (surfaceSensorListening) { toast("Sensor de superfície já está ativo."); return; }
+    if (!window.DeviceOrientationEvent) { toast("Este navegador não oferece sensor de orientação."); return; }
+    var permission = typeof window.DeviceOrientationEvent.requestPermission === "function" ?
+      window.DeviceOrientationEvent.requestPermission() : Promise.resolve("granted");
+    permission.then(function (state) {
+      if (state !== "granted") { toast("Permissão do sensor de orientação negada."); return; }
+      surfaceSensorListening = true;
+      toast("Sensor de superfície ativado.");
+    }).catch(function () { toast("Não foi possível ativar o sensor de orientação."); });
+  });
+  $("standbyPhoto").hidden = true;
+
+  function artSvg(T) {
+    var hue = T.hue;
     return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 432" preserveAspectRatio="xMidYMid slice">' +
-      '<defs><linearGradient id="g" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="hsl(' + hue + ',70%,88%)"/><stop offset="1" stop-color="hsl(' + (hue + 50) + ',55%,52%)"/></linearGradient></defs>' +
-      '<rect width="400" height="432" fill="url(#g)"/>' + dots +
-      '<g transform="translate(200 200)">' + p + '<circle r="34" fill="hsl(' + (hue + 40) + ',90%,86%)"/><circle r="16" fill="hsl(' + (hue + 20) + ',80%,60%)"/></g></svg>';
+      '<defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="hsl(' + hue + ',42%,38%)"/><stop offset="1" stop-color="hsl(' + (hue + 34) + ',32%,12%)"/></linearGradient></defs>' +
+      '<rect width="400" height="432" fill="url(#g)"/><circle cx="200" cy="216" r="74" fill="none" stroke="rgba(255,255,255,.22)" stroke-width="2"/>' +
+      '<path d="M218 164v103a34 34 0 1 1-18-30v-94l84-18v105a34 34 0 1 1-18-30v-96z" fill="rgba(255,255,255,.82)"/></svg>';
   }
   function svgUrl(T) { return "data:image/svg+xml;charset=utf-8," + encodeURIComponent(artSvg(T)); }
   function rebuild(keepId) {
@@ -654,8 +1102,11 @@ body {
     if (dbp) return dbp;
     dbp = new Promise(function (res, rej) {
       try {
-        var r = indexedDB.open("click-wheel", 1);
-        r.onupgradeneeded = function () { r.result.createObjectStore("tracks", { keyPath: "id" }); };
+        var r = indexedDB.open("click-wheel", 2);
+        r.onupgradeneeded = function () {
+          if (!r.result.objectStoreNames.contains("tracks")) r.result.createObjectStore("tracks", { keyPath: "id" });
+          if (!r.result.objectStoreNames.contains("settings")) r.result.createObjectStore("settings", { keyPath: "key" });
+        };
         r.onsuccess = function () { res(r.result); };
         r.onerror = function () { rej(r.error); };
       } catch (e) { rej(e); }
@@ -671,6 +1122,20 @@ body {
       });
     });
   }
+  function dbSettingReq(mode, fn) {
+    return db().then(function (d) {
+      return new Promise(function (res, rej) {
+        var tx = d.transaction("settings", mode), q = fn(tx.objectStore("settings"));
+        tx.oncomplete = function () { res(q ? q.result : undefined); };
+        tx.onerror = tx.onabort = function () { rej(tx.error); };
+      });
+    });
+  }
+  var dbSettingGet = function (key) { return dbSettingReq("readonly", function (s) { return s.get(key); }).then(function (rec) { return rec && rec.value; }); };
+  var dbSettingPut = function (key, value) { return dbSettingReq("readwrite", function (s) { return s.put({ key:key, value:value }); }); };
+  var dbSettingDel = function (key) { return dbSettingReq("readwrite", function (s) { return s["delete"](key); }); };
+  dbSettingGet("standbyPhoto").then(function (photo) { if (photo) setStandbyPhoto(photo); })
+    .catch(function () { toast("Não foi possível restaurar a foto da tela de descanso."); });
   var dbAll = function () { return dbReq("readonly", function (s) { return s.getAll(); }); };
   var dbPut = function (rec) { return dbReq("readwrite", function (s) { return s.put(rec); }); };
   var dbDel = function (id) { return dbReq("readwrite", function (s) { return s["delete"](id); }); };
@@ -745,8 +1210,9 @@ body {
   }
   function makeTrack(rec) {
     var hs = strHash(rec.title + rec.id);
-    var T = { id: rec.id, kind: "file", title: rec.title, artist: rec.artist, album: rec.album, dur: rec.dur || 0, blob: rec.file, cover: rec.cover || null, artworkUrl: rec.artworkUrl || "", added: rec.added, hue: hs % 360, petals: 5 + (hs % 5), seed: hs % 997, size: rec.file ? rec.file.size : 0, fmt: rec.file ? fileFormat(rec.file) : "" };
+    var T = { id: rec.id, kind: "file", title: rec.title, artist: rec.artist, album: rec.album, dur: rec.dur || 0, blob: rec.file, cover: rec.cover || null, artworkUrl: rec.artworkUrl || "", animatedCoverBlob: rec.animatedCover || null, animatedCoverIsVideo: !!(rec.animatedCoverIsVideo || (rec.animatedCover && rec.animatedCover.type && rec.animatedCover.type.indexOf("video/") === 0)), added: rec.added, hue: hs % 360, size: rec.file ? rec.file.size : 0, fmt: rec.file ? fileFormat(rec.file) : "" };
     T.coverUrl = rec.cover ? URL.createObjectURL(rec.cover) : (rec.artworkUrl || svgUrl(T));
+    T.animatedCoverUrl = T.animatedCoverBlob ? URL.createObjectURL(T.animatedCoverBlob) : "";
     return T;
   }
 
@@ -843,6 +1309,8 @@ body {
     ensureCtx();
     var T = list[cur];
     if (!T) return;
+    window.clearTimeout(standbyTimer);
+    if (!$("standby").hidden) hideStandby();
     halt();
     pos = Math.max(0, Math.min((T.dur || 1e9) - 0.5, p));
     playing = true;
@@ -864,6 +1332,7 @@ body {
     playing = false;
     halt();
     ui();
+    scheduleStandby(5000);
   }
   function toggle() { if (!list.length) return; playing ? pause() : startAt(pos); }
   function load(i, auto) {
@@ -901,20 +1370,14 @@ body {
   }
 
   /* ---------- Interface ---------- */
-  var motionPreference = lsGet("spherepod-motion") || "auto";
-  function detectCoverMotion(T) {
-    var meta = [T.artist,T.album,T.title].join(" ").toLowerCase();
-    if (/maroon\s*5/.test(meta) && /songs?\s+about\s+jane/.test(meta)) return "liquid";
-    if (/billie\s+eilish/.test(meta) && /(when we all fall asleep|dont smile at me|happier than ever)/.test(meta)) return "tear";
-    if (/lil\s+nas\s*x/.test(meta) && /(montero|7 ep)/.test(meta)) return "float";
-    return "off";
-  }
+  var savedMotionPreference = lsGet("spherepod-motion");
+  var motionPreference = savedMotionPreference === "float" || savedMotionPreference === "off" ? savedMotionPreference : "zoom";
   function applyCoverMotion(T) {
     var art = document.querySelector(".screen .art");
-    var mode = motionPreference === "auto" ? detectCoverMotion(T) : motionPreference;
-    art.classList.remove("motion-liquid","motion-tear","motion-float");
-    if (mode !== "off") art.classList.add("motion-" + mode);
-    art.style.setProperty("--cover-backdrop", T && T.coverUrl ? 'url("' + String(T.coverUrl).replace(/["\\\\]/g,"%22") + '")' : "none");
+    art.classList.remove("motion-zoom","motion-float","motion-off");
+    art.classList.add("motion-" + motionPreference);
+    var backdropUrl = T && (T.animatedCoverUrl && !T.animatedCoverIsVideo ? T.animatedCoverUrl : T.coverUrl);
+    art.style.setProperty("--cover-backdrop", backdropUrl ? 'url("' + String(backdropUrl).replace(/["\\\\]/g,"%22") + '")' : "none");
     $("motionMode").value = motionPreference;
   }
   $("motionMode").value = motionPreference;
@@ -922,15 +1385,42 @@ body {
     motionPreference = $("motionMode").value;
     lsSet("spherepod-motion", motionPreference);
     if (list[cur]) applyCoverMotion(list[cur]);
-    toast(motionPreference === "auto" ? "Movimento automático ativado." : "Movimento da capa atualizado.");
+    toast("Movimento da capa atualizado.");
   });
 
   function setNowPlaying(T) {
+    var art = document.querySelector(".screen .art"), video = $("coverVideo");
     var img = $("artImg");
+    video.poster = T.coverUrl || "";
+    video.onerror = function () {
+      if (art.classList.contains("video-cover")) {
+        art.classList.remove("video-cover");
+        toast("Não foi possível reproduzir este vídeo; a capa original foi mantida.");
+      }
+    };
+    video.pause();
+    art.classList.toggle("video-cover", !!(T.animatedCoverUrl && T.animatedCoverIsVideo));
+    if (T.animatedCoverUrl && T.animatedCoverIsVideo) {
+      if (video.src !== T.animatedCoverUrl) video.src = T.animatedCoverUrl;
+      if (video.readyState >= 1) video.currentTime = 0;
+      video.play().catch(function () {
+        if (list[cur] && list[cur].id === T.id) {
+          art.classList.remove("video-cover");
+          toast("Não foi possível iniciar o vídeo; a capa original foi mantida.");
+        }
+      });
+    } else {
+      video.removeAttribute("src");
+      video.load();
+    }
     img.classList.remove("pop"); void img.offsetWidth;
-    img.src = T.coverUrl; img.classList.add("pop"); document.body.classList.add("has-track"); applyCoverMotion(T);
+    img.src = T.animatedCoverUrl && !T.animatedCoverIsVideo ? T.animatedCoverUrl : T.coverUrl; img.classList.add("pop");
+    document.body.classList.add("has-track"); document.body.classList.remove("welcome-mode");
+    $("screen").setAttribute("aria-label", "Tocando agora");
+    applyCoverMotion(T);
     $("title").textContent = T.title;
     $("artist").textContent = T.artist;
+    $("bRemoveAnimatedCover").hidden = !T.animatedCoverBlob;
     [$("title"), $("artist")].forEach(function (e) { e.style.animation = "none"; void e.offsetWidth; e.style.animation = ""; });
     document.title = T.title + " · SpherePod";
     try {
@@ -965,7 +1455,7 @@ body {
       b.className = "cf-item"; b.type = "button";
       b.setAttribute("aria-label", T.title + ", " + T.artist);
       var box = document.createElement("div"); box.className = "cf-box";
-      var im = document.createElement("img"); im.alt = ""; im.src = T.coverUrl; im.draggable = false;
+      var im = document.createElement("img"); im.alt = ""; im.src = T.animatedCoverUrl && !T.animatedCoverIsVideo ? T.animatedCoverUrl : T.coverUrl; im.draggable = false;
       var cap = document.createElement("div"); cap.className = "cf-cap";
       var t = document.createElement("b"); t.textContent = T.title;
       var a = document.createElement("span"); a.textContent = T.artist;
@@ -1133,16 +1623,20 @@ body {
   }
   function showEmpty() {
     playing = false; pos = 0; halt();
-    $("title").textContent = "Sua música começa aqui";
-    $("artist").textContent = "Adicione um áudio ou vídeo para começar";
+    $("coverVideo").pause();
+    $("coverVideo").removeAttribute("src");
+    $("coverVideo").load();
+    document.querySelector(".screen .art").classList.remove("video-cover");
     $("artImg").removeAttribute("src");
-    $("artImg").classList.remove("pop"); document.querySelector(".screen .art").classList.remove("motion-liquid","motion-tear","motion-float");
-    document.title = "SpherePod — seu player pessoal";
+    $("artImg").classList.remove("pop"); document.querySelector(".screen .art").classList.remove("motion-zoom","motion-float","motion-off");
+    $("screen").setAttribute("aria-label", "Mensagem de boas-vindas");
+    renderWelcome();
     $$(".js-fill").forEach(function (e) { e.style.width = "0%"; });
     $$(".js-knob").forEach(function (e) { e.style.left = "0%"; });
     $$(".js-tcur").forEach(function (e) { e.textContent = "0:00"; });
     $$(".js-trem").forEach(function (e) { e.textContent = "--:--"; });
     document.body.classList.remove("is-playing","has-track");
+    $("bRemoveAnimatedCover").hidden = true;
   }
   function removeTrack(id) {
     var idx = list.findIndex(function (t) { return t.id === id; });
@@ -1152,6 +1646,7 @@ body {
     var keep = wasCur ? null : list[cur].id;
     imported = imported.filter(function (t) { return t.id !== id; });
     if (T.coverUrl && T.coverUrl.indexOf("blob:") === 0) URL.revokeObjectURL(T.coverUrl);
+    if (T.animatedCoverUrl) URL.revokeObjectURL(T.animatedCoverUrl);
     if (bufCache.id === id) bufCache = { id: null, buf: null };
     dbDel(id).catch(function () {});
     list = imported.slice();
@@ -1175,8 +1670,11 @@ body {
   var AUDIO_RE = /\.(mp3|m4a|aac|flac|wav|ogg|opus|oga|weba)$/i;
   /* OGG é áudio por padrão; só será vídeo se o MIME declarar video/. */
   var VIDEO_RE = /\.(mp4|m4v|mov|webm|ogv|mkv|avi)$/i;
-  function importFiles(files) {
+  function importFiles(files, onComplete) {
     var picked = Array.prototype.slice.call(files || []);
+    function finishImport(count, failed) {
+      if (typeof onComplete === "function") onComplete(count, failed);
+    }
     function mediaKind(f) {
       var mime = String(f.type || "").toLowerCase();
       if (mime.indexOf("video/") === 0) return "video";
@@ -1192,7 +1690,11 @@ body {
       openVideo(URL.createObjectURL(vf), vf.name, true);
       if (vids.length > 1) toast("Vídeo aberto. Importe os demais individualmente.");
     }
-    if (!arr.length) { if (!vids.length) toast("Escolha arquivos de áudio ou vídeo compatíveis com seu navegador."); return; }
+    if (!arr.length) {
+      if (!vids.length) toast("Escolha arquivos de áudio ou vídeo compatíveis com seu navegador.");
+      finishImport(0, false);
+      return;
+    }
     toast("Adicionando " + arr.length + (arr.length > 1 ? " músicas…" : " música…"));
     var added = [], failedSave = false;
     arr.reduce(function (chain, file, k) {
@@ -1220,11 +1722,101 @@ body {
       else ui();
       renderLib();
       toast(failedSave ? "Adicionadas só nesta sessão: o navegador não permitiu salvar." : added.length + (added.length > 1 ? " músicas salvas na biblioteca." : " música salva na biblioteca."));
-    }).catch(function () { toast("Algo deu errado ao importar. Tente de novo."); });
+      finishImport(added.length, failedSave);
+      if (!failedSave && navigator.storage && navigator.storage.persist) navigator.storage.persist().catch(function () {});
+    }).catch(function () {
+      toast("Algo deu errado ao importar. Tente de novo.");
+      finishImport(0, true);
+    });
   }
   var fileInput = $("file");
   fileInput.addEventListener("change", function () { importFiles(fileInput.files); fileInput.value = ""; });
+  var onboardingAudioFile = $("onboardingAudioFile");
+  onboardingAudioFile.addEventListener("change", function () {
+    var files = onboardingAudioFile.files;
+    onboardingAudioFile.value = "";
+    if (!files || !files.length) return;
+    $("onboardingImportState").textContent = "Importando e salvando as músicas neste dispositivo…";
+    importFiles(files, function (count, failed) {
+      $("onboardingImportState").textContent = failed ?
+        "Não foi possível salvar todas as músicas. Confira o espaço disponível e tente de novo." :
+        (count ? count + (count === 1 ? " música salva neste dispositivo e pronta para uso offline." : " músicas salvas neste dispositivo e prontas para uso offline.") :
+          "Nenhuma música foi importada. Escolha um arquivo de áudio compatível.");
+    });
+  });
   function pickFiles() { fileInput.click(); }
+  var animatedCoverFile = $("animatedCoverFile"), animatedCoverTargetId = null;
+  $("bAnimatedCover").addEventListener("click", function () {
+    $("settingsPop").classList.remove("open");
+    var T = list[cur];
+    if (!T || T.kind !== "file") { toast("Selecione uma música da biblioteca primeiro."); return; }
+    animatedCoverTargetId = T.id;
+    animatedCoverFile.click();
+  });
+  animatedCoverFile.addEventListener("change", function () {
+    var file = animatedCoverFile.files && animatedCoverFile.files[0];
+    animatedCoverFile.value = "";
+    if (!file) return;
+    var type = String(file.type || "").toLowerCase();
+    var isVideoCover = type.indexOf("video/") === 0 || /\.(mp4|webm|mov|m4v)$/i.test(file.name);
+    var isAnimatedImage = type === "image/gif" || type === "image/webp" || /\.(gif|webp)$/i.test(file.name);
+    if (!isVideoCover && !isAnimatedImage) {
+      toast("Escolha uma animação GIF, WebP, MP4 ou WebM.");
+      return;
+    }
+    var T = imported.find(function (track) { return track.id === animatedCoverTargetId; });
+    animatedCoverTargetId = null;
+    if (!T) { toast("A música selecionada não está mais na biblioteca."); return; }
+    var url = URL.createObjectURL(file), preview = isVideoCover ? document.createElement("video") : new Image();
+    function saveAnimatedCover() {
+      dbReq("readonly", function (store) { return store.get(T.id); }).then(function (record) {
+        if (!record) throw new Error("Faixa não encontrada no armazenamento local.");
+        record.animatedCover = file;
+        record.animatedCoverIsVideo = isVideoCover;
+        return dbPut(record);
+      }).then(function () {
+        if (T.animatedCoverUrl) URL.revokeObjectURL(T.animatedCoverUrl);
+        T.animatedCoverBlob = file;
+        T.animatedCoverUrl = url;
+        T.animatedCoverIsVideo = isVideoCover;
+        buildFlow();
+        if (list[cur] && list[cur].id === T.id) setNowPlaying(T);
+        $("settingsPop").classList.remove("open");
+        toast("Capa animada salva para " + T.title + ".");
+      }).catch(function () {
+        URL.revokeObjectURL(url);
+        toast("Não foi possível salvar a capa animada neste navegador.");
+      });
+    }
+    preview.muted = true;
+    preview.playsInline = true;
+    preview.preload = "metadata";
+    preview.onloadedmetadata = isVideoCover ? saveAnimatedCover : null;
+    preview.onload = isVideoCover ? null : saveAnimatedCover;
+    preview.onerror = function () {
+      URL.revokeObjectURL(url);
+      toast("O navegador não conseguiu abrir essa animação. Tente outro GIF, WebP ou vídeo.");
+    };
+    preview.src = url;
+  });
+  $("bRemoveAnimatedCover").addEventListener("click", function () {
+    var T = list[cur];
+    if (!T || !T.animatedCoverBlob) return;
+    dbReq("readonly", function (store) { return store.get(T.id); }).then(function (record) {
+      if (!record) throw new Error("Faixa não encontrada no armazenamento local.");
+      delete record.animatedCover;
+      delete record.animatedCoverIsVideo;
+      return dbPut(record);
+    }).then(function () {
+      if (T.animatedCoverUrl) URL.revokeObjectURL(T.animatedCoverUrl);
+      T.animatedCoverBlob = null;
+      T.animatedCoverUrl = "";
+      T.animatedCoverIsVideo = false;
+      buildFlow();
+      if (list[cur] && list[cur].id === T.id) setNowPlaying(T);
+      toast("Capa original restaurada.");
+    }).catch(function () { toast("Não foi possível remover a capa animada."); });
+  });
   var dragDepth = 0;
   window.addEventListener("dragenter", function (e) { if (e.dataTransfer && Array.prototype.indexOf.call(e.dataTransfer.types || [], "Files") >= 0) { dragDepth++; $("dropmask").classList.add("on"); } });
   window.addEventListener("dragleave", function () { dragDepth = Math.max(0, dragDepth - 1); if (!dragDepth) $("dropmask").classList.remove("on"); });
@@ -1234,24 +1826,117 @@ body {
 
   /* ---------- Vídeo local e transmissões por URL ---------- */
   var videoDialog = $("videoDialog"), videoPlayer = $("videoPlayer"), videoObjectUrl = null;
+  var videoStage = $("videoStage");
   function openVideo(url, label, isObjectUrl) {
+    window.clearTimeout(standbyTimer);
+    if (!$("standby").hidden) hideStandby();
     if (videoObjectUrl && videoObjectUrl.indexOf("blob:") === 0) URL.revokeObjectURL(videoObjectUrl);
     videoObjectUrl = isObjectUrl ? url : null;
     videoPlayer.src = url;
     $("videoCaption").textContent = label || "SpherePod";
     videoDialog.classList.add("open"); videoDialog.setAttribute("aria-hidden","false");
-    videoPlayer.play().catch(function(){});
+    videoPlayer.play().catch(function () {
+      if (videoPlayer.error) toast("Este vídeo não pode ser reproduzido neste navegador ou formato.");
+    });
   }
   function closeVideo() {
+    if (document.fullscreenElement === videoDialog && document.exitFullscreen) document.exitFullscreen().catch(function () {});
     videoPlayer.pause(); videoPlayer.removeAttribute("src"); videoPlayer.load();
     videoDialog.classList.remove("open"); videoDialog.setAttribute("aria-hidden","true");
     if (videoObjectUrl) URL.revokeObjectURL(videoObjectUrl);
     videoObjectUrl = null;
+    scheduleStandby(5000);
   }
+  videoPlayer.addEventListener("pause", function () {
+    if (videoDialog.classList.contains("open")) scheduleStandby(5000);
+  });
   $("videoClose").addEventListener("click", closeVideo);
+  var videoOrientationResizeHandler = null;
+  function lockVideoLandscape() {
+    var orientation = window.screen && window.screen.orientation;
+    function enforceLandscapeFallback() {
+      var isPortrait = window.matchMedia("(orientation: portrait)").matches;
+      videoDialog.classList.toggle("force-landscape", isPortrait);
+      if (isPortrait && document.fullscreenElement === videoDialog) {
+        videoStage.style.position = "absolute";
+        videoStage.style.top = "50%";
+        videoStage.style.left = "50%";
+        videoStage.style.right = "auto";
+        videoStage.style.bottom = "auto";
+        videoStage.style.width = "100dvh";
+        videoStage.style.height = "100dvw";
+        videoStage.style.transform = "translate(-50%,-50%) rotate(90deg)";
+        videoPlayer.style.width = "100%";
+        videoPlayer.style.height = "100%";
+        videoPlayer.style.maxHeight = "none";
+      } else {
+        ["position","top","left","right","bottom","width","height","transform"].forEach(function (property) {
+          videoStage.style.removeProperty(property);
+        });
+        ["width","height","max-height"].forEach(function (property) { videoPlayer.style.removeProperty(property); });
+      }
+    }
+    function onViewportChange() {
+      if (document.fullscreenElement === videoDialog) enforceLandscapeFallback();
+    }
+    if (videoOrientationResizeHandler) {
+      window.removeEventListener("resize", videoOrientationResizeHandler);
+      window.removeEventListener("orientationchange", videoOrientationResizeHandler);
+    }
+    videoOrientationResizeHandler = onViewportChange;
+    window.addEventListener("resize", videoOrientationResizeHandler);
+    window.addEventListener("orientationchange", videoOrientationResizeHandler);
+    if (!orientation || typeof orientation.lock !== "function") {
+      enforceLandscapeFallback();
+      return Promise.resolve();
+    }
+    return orientation.lock("landscape").then(function () {
+      window.setTimeout(enforceLandscapeFallback, 250);
+    }).catch(function () {
+      enforceLandscapeFallback();
+      if (videoDialog.classList.contains("force-landscape")) {
+        toast("Este navegador não fixa a orientação; o vídeo será exibido de lado.");
+      }
+    });
+  }
+  function unlockVideoOrientation() {
+    var orientation = window.screen && window.screen.orientation;
+    if (orientation && typeof orientation.unlock === "function") orientation.unlock();
+    if (videoOrientationResizeHandler) {
+      window.removeEventListener("resize", videoOrientationResizeHandler);
+      window.removeEventListener("orientationchange", videoOrientationResizeHandler);
+      videoOrientationResizeHandler = null;
+    }
+    videoDialog.classList.remove("force-landscape");
+    ["position","top","left","right","bottom","width","height","transform"].forEach(function (property) {
+      videoStage.style.removeProperty(property);
+    });
+    ["width","height","max-height"].forEach(function (property) { videoPlayer.style.removeProperty(property); });
+  }
+  document.addEventListener("fullscreenchange", function () {
+    if (!document.fullscreenElement) {
+      unlockVideoOrientation();
+      var container = document.body.getAttribute("data-view") === "flow" ? $("flow") : $("screen");
+      container.appendChild(videoDialog);
+    }
+  });
+  videoPlayer.addEventListener("webkitendfullscreen", unlockVideoOrientation);
   $("videoFullscreen").addEventListener("click", function () {
-    var p = videoPlayer.requestFullscreen ? videoPlayer.requestFullscreen() : (videoPlayer.webkitEnterFullscreen ? videoPlayer.webkitEnterFullscreen() : null);
-    if (p && p.catch) p.catch(function(){ toast("Tela cheia não disponível neste navegador."); });
+    var request = videoDialog.requestFullscreen || videoDialog.webkitRequestFullscreen;
+    if (request) {
+      Promise.resolve(request.call(videoDialog)).then(lockVideoLandscape).catch(function () {
+        toast("Não foi possível abrir o vídeo em tela cheia neste navegador.");
+      });
+    } else if (videoPlayer.requestFullscreen) {
+      Promise.resolve(videoPlayer.requestFullscreen()).then(lockVideoLandscape).catch(function () {
+        toast("Não foi possível abrir o vídeo em tela cheia neste navegador.");
+      });
+    } else if (videoPlayer.webkitEnterFullscreen) {
+      try { videoPlayer.webkitEnterFullscreen(); }
+      catch (error) { toast("Não foi possível abrir o vídeo em tela cheia neste navegador."); }
+    } else {
+      toast("Tela cheia não está disponível neste navegador.");
+    }
   });
   $("bSettings").addEventListener("click", function () { $("settingsPop").classList.toggle("open"); });
   var activeTheme = lsGet("spherepod-theme") || "dark";
@@ -1298,7 +1983,7 @@ body {
           if (meta) {
             T.title = meta.title; T.artist = meta.artist; T.album = meta.album;
             if (!T.cover && meta.artworkUrl) { T.artworkUrl = meta.artworkUrl; T.coverUrl = meta.artworkUrl; }
-            var rec = { id: T.id, title: T.title, artist: T.artist, album: T.album, dur: T.dur, added: T.added, file: T.blob, cover: T.cover, artworkUrl: T.artworkUrl || "" };
+            var rec = { id: T.id, title: T.title, artist: T.artist, album: T.album, dur: T.dur, added: T.added, file: T.blob, cover: T.cover, artworkUrl: T.artworkUrl || "", animatedCover: T.animatedCoverBlob || null, animatedCoverIsVideo: !!T.animatedCoverIsVideo };
             return dbPut(rec).then(function () { found++; });
           }
         }).catch(function () {}).then(function () {
@@ -1516,8 +2201,20 @@ body {
     var pref = lsGet("spherepod-view");
     var v = pref === "flow" || pref === "wheel" ? pref : (mq.matches ? "flow" : "wheel");
     document.body.setAttribute("data-view", v);
-    if (v === "flow") { $("ftools").appendChild($("tools")); $("flow").appendChild(lib); }
-    else { $("device").appendChild($("tools")); $("screen").appendChild(lib); }
+    if (v === "flow") {
+      $("ftools").appendChild($("tools"));
+      $("ftools").appendChild($("coverActions"));
+      $("ftools").appendChild($("settingsPop"));
+      $("flow").appendChild(lib);
+      if (document.fullscreenElement !== $("videoDialog")) $("flow").appendChild($("videoDialog"));
+    }
+    else {
+      $("device").appendChild($("tools"));
+      $("screen").appendChild($("coverActions"));
+      $("screen").appendChild($("settingsPop"));
+      $("screen").appendChild(lib);
+      if (document.fullscreenElement !== $("videoDialog")) $("screen").appendChild($("videoDialog"));
+    }
     requestAnimationFrame(function () { layoutFlow(); if (libOpen) keepSelVisible(); });
   }
   $("bView").addEventListener("click", function () {
@@ -1527,8 +2224,142 @@ body {
   });
   if (mq.addEventListener) mq.addEventListener("change", function () { lsSet("spherepod-view", "auto"); applyView(); });
   else if (mq.addListener) mq.addListener(function () { lsSet("spherepod-view", "auto"); applyView(); });
+  if (mq.addEventListener) mq.addEventListener("change", function () { scheduleStandby(4500); maybeScheduleChargingStandby(); });
+  else if (mq.addListener) mq.addListener(function () { scheduleStandby(4500); maybeScheduleChargingStandby(); });
 
-  function clock() { var d = new Date(); $("clock").textContent = d.getHours() + ":" + String(d.getMinutes()).padStart(2, "0"); }
+  function syncBattery() {
+    if (!navigator.getBattery) return;
+    navigator.getBattery().then(function (battery) {
+      batteryManager = battery;
+      function updateBattery() {
+        var level = Math.round(battery.level * 100);
+        var icon = $("batteryIcon");
+        $("batteryLevel").setAttribute("width", (17 * battery.level).toFixed(1));
+        icon.classList.toggle("is-charging", battery.charging);
+        icon.setAttribute("aria-label", "Bateria " + level + "%" + (battery.charging ? ", carregando" : ""));
+        $("batteryIcon").removeAttribute("hidden");
+      }
+      function chargingChanged() {
+        updateBattery();
+        maybeScheduleChargingStandby();
+      }
+      updateBattery();
+      battery.addEventListener("levelchange", updateBattery);
+      battery.addEventListener("chargingchange", chargingChanged);
+      chargingChanged();
+    }).catch(function () { $("batteryIcon").setAttribute("hidden", ""); });
+  }
+  function watchHeadphones() {
+    if (!navigator.mediaDevices || !navigator.mediaDevices.enumerateDevices) return;
+    var hadHeadphones = null, detectionErrorShown = false;
+    function inspectOutputs() {
+      navigator.mediaDevices.enumerateDevices().then(function (devices) {
+        var connected = devices.some(function (device) {
+          return device.kind === "audiooutput" && /headphone|headset|earphone|airpods|buds|fone|fone de ouvido/i.test(device.label || "");
+        });
+        if (hadHeadphones === false && connected) toast("Fone de ouvido conectado.");
+        else if (hadHeadphones === true && !connected) toast("Fone de ouvido desconectado.");
+        hadHeadphones = connected;
+      }).catch(function () {
+        if (!detectionErrorShown) {
+          detectionErrorShown = true;
+          toast("Não foi possível verificar a conexão de fones neste navegador.");
+        }
+      });
+    }
+    inspectOutputs();
+    if (navigator.mediaDevices.addEventListener) navigator.mediaDevices.addEventListener("devicechange", inspectOutputs);
+    else navigator.mediaDevices.ondevicechange = inspectOutputs;
+  }
+  function clock() {
+    var d = new Date();
+    $("clock").textContent = d.getHours() + ":" + String(d.getMinutes()).padStart(2, "0");
+    if (document.body.classList.contains("welcome-mode") || !$("standby").hidden) renderWelcome(d);
+  }
+  var onboardingAccepted = lsGet("spherepod-terms-accepted") === "1";
+  var onboardingComplete = lsGet("spherepod-onboarding-complete") === "1";
+  function setOnboardingBackgroundInert(value) {
+    [$("device"), $("flow"), $("lib"), $("streamDialog"), $("videoDialog")].forEach(function (element) {
+      element.inert = value;
+    });
+  }
+  function setOnboardingOpen(open) {
+    $("onboarding").hidden = !open;
+    setOnboardingBackgroundInert(open);
+    if (open) {
+      var firstAction = onboardingAccepted ? $("onboardingContinue") : $("onboardingAccept");
+      window.setTimeout(function () { firstAction.focus(); }, 0);
+    }
+  }
+  function unlockOnboardingActions() {
+    $("onboardingLocation").disabled = !onboardingAccepted;
+    $("onboardingImport").disabled = !onboardingAccepted;
+    $("onboardingContinue").disabled = !onboardingAccepted;
+    $("onboardingConsentState").textContent = onboardingAccepted ? "Aceite registrado neste dispositivo." : "Necessário para continuar.";
+  }
+  $("onboardingAccept").addEventListener("click", function () {
+    lsSet("spherepod-terms-accepted", "1");
+    if (lsGet("spherepod-terms-accepted") !== "1") {
+      $("onboardingConsentState").textContent = "Não foi possível guardar o aceite neste navegador. Verifique as configurações de armazenamento.";
+      return;
+    }
+    onboardingAccepted = true;
+    unlockOnboardingActions();
+  });
+  $("onboardingLocation").addEventListener("click", function () {
+    if (!onboardingAccepted) return;
+    $("onboardingLocation").disabled = true;
+    $("onboardingLocationState").textContent = "Aguardando a autorização do navegador…";
+    requestLocationWeather(function (success, message) {
+      $("onboardingLocation").disabled = false;
+      $("onboardingLocationState").textContent = success ? "Localização autorizada. " + message : message + " Você pode tentar novamente ou continuar sem clima.";
+    });
+  });
+  $("onboardingImport").addEventListener("click", function () {
+    if (!onboardingAccepted) return;
+    onboardingAudioFile.click();
+  });
+  $("onboardingContinue").addEventListener("click", function () {
+    if (!onboardingAccepted) return;
+    lsSet("spherepod-onboarding-complete", "1");
+    if (lsGet("spherepod-onboarding-complete") !== "1") {
+      $("onboardingConsentState").textContent = "Não foi possível guardar sua configuração. Verifique as configurações de armazenamento.";
+      return;
+    }
+    onboardingComplete = true;
+    setOnboardingOpen(false);
+    scheduleStandby(5000);
+    $("bAdd").focus();
+  });
+  document.addEventListener("keydown", function (event) {
+    if ($("onboarding").hidden) return;
+    if (event.key === "Escape") { event.preventDefault(); return; }
+    if (event.key !== "Tab") return;
+    var focusable = $$("button:not(:disabled)", $("onboarding"));
+    if (!focusable.length) return;
+    var first = focusable[0], last = focusable[focusable.length - 1];
+    if (event.shiftKey && document.activeElement === first) {
+      event.preventDefault();
+      last.focus();
+    } else if (!event.shiftKey && document.activeElement === last) {
+      event.preventDefault();
+      first.focus();
+    }
+  });
+  unlockOnboardingActions();
+  if (!onboardingComplete) {
+    setOnboardingOpen(true);
+  } else {
+    if (lsGet("spherepod-weather-optin") === "1") requestLocationWeather();
+    scheduleStandby(5000);
+  }
+  if ("serviceWorker" in navigator && window.isSecureContext) {
+    navigator.serviceWorker.register("./service-worker.js").catch(function (error) {
+      console.error("Não foi possível preparar o SpherePod para uso offline.", error);
+    });
+  }
+  syncBattery();
+  watchHeadphones();
   clock(); setInterval(clock, 20000);
 
   /* ---------- Início ---------- */
