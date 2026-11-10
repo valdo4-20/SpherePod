@@ -993,10 +993,10 @@ body.has-track .screen .art img{animation:kb 22s ease-in-out infinite alternate}
     $("artImg").removeAttribute("src");
     $("artImg").classList.remove("pop"); document.querySelector(".screen .art").classList.remove("motion-liquid","motion-tear","motion-float");
     document.title = "SpherePod — seu player pessoal";
-    $(".js-fill").forEach(function (e) { e.style.width = "0%"; });
-    $(".js-knob").forEach(function (e) { e.style.left = "0%"; });
-    $(".js-tcur").forEach(function (e) { e.textContent = "0:00"; });
-    $(".js-trem").forEach(function (e) { e.textContent = "--:--"; });
+    $$(".js-fill").forEach(function (e) { e.style.width = "0%"; });
+    $$(".js-knob").forEach(function (e) { e.style.left = "0%"; });
+    $$(".js-tcur").forEach(function (e) { e.textContent = "0:00"; });
+    $$(".js-trem").forEach(function (e) { e.textContent = "--:--"; });
     document.body.classList.remove("is-playing","has-track");
   }
   function removeTrack(id) {
