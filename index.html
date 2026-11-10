@@ -1074,21 +1074,23 @@ body.has-track .screen .art img{animation:kb 22s ease-in-out infinite alternate}
   applyTheme();
 
   function searchCatalogTrack(T) {
-    var term = [T.title, T.artist && T.artist !== "Artista não identificado" ? T.artist : ""].filter(Boolean).join(" ");
-    var url = "https://itunes.apple.com/search?media=music&entity=song&limit=12&country=br&term=" + encodeURIComponent(term);
-    return fetch(url).then(function (r) { if (!r.ok) throw new Error("Busca indisponível"); return r.json(); }).then(function (data) {
-      function key(v) { return normalizeTrackTitle(v || "").toLowerCase(); }
+    var title = String(T.title || "").replace(/["\\\\]/g, " ").trim();
+    var artist = String(T.artist || "").replace(/["\\\\]/g, " ").trim();
+    var query = 'recording:"' + title + '"' + (artist && artist !== "Artista não identificado" ? ' AND artist:"' + artist + '"' : "");
+    var url = "https://musicbrainz.org/ws/2/recording/?fmt=json&limit=8&inc=releases&query=" + encodeURIComponent(query);
+    return fetch(url).then(function (r) { if (!r.ok) throw new Error("Catálogo indisponível"); return r.json(); }).then(function (data) {
+      function key(v) { return normalizeTrackTitle(v || "").normalize("NFD").replace(/[\\u0300-\\u036f]/g, "").toLowerCase(); }
       var wanted = key(T.title), artistWanted = key(T.artist);
-      var candidates = (data.results || []).map(function (x) {
-        var title = key(x.trackName), artist = key(x.artistName);
-        var titleScore = title === wanted ? 1 : (title.indexOf(wanted) >= 0 || wanted.indexOf(title) >= 0 ? 0.82 : 0);
-        var artistScore = !artistWanted || artistWanted === key("Artista não identificado") ? 0.5 : (artist === artistWanted ? 1 : (artist.indexOf(artistWanted) >= 0 || artistWanted.indexOf(artist) >= 0 ? 0.8 : 0));
+      var candidates = (data.recordings || []).map(function (x) {
+        var titleKey = key(x.title), artistKey = key(x["artist-credit-phrase"] || "");
+        var titleScore = titleKey === wanted ? 1 : (titleKey.indexOf(wanted) >= 0 || wanted.indexOf(titleKey) >= 0 ? 0.82 : 0);
+        var artistScore = !artistWanted || artistWanted === key("Artista não identificado") ? 0.5 : (artistKey === artistWanted ? 1 : (artistKey.indexOf(artistWanted) >= 0 || artistWanted.indexOf(artistKey) >= 0 ? 0.8 : 0));
         return { item: x, score: titleScore * 0.72 + artistScore * 0.28, titleScore: titleScore };
       }).filter(function (x) { return x.titleScore >= 0.8; }).sort(function (a, b) { return b.score - a.score; });
       if (!candidates.length) return null;
-      var x = candidates[0].item, art = x.artworkUrl100 || "";
-      if (art) art = art.replace(/\\d+x\\d+bb\\./, "600x600bb.");
-      return { title: x.trackName || T.title, artist: x.artistName || T.artist, album: x.collectionName || T.album || "", artworkUrl: art };
+      var x = candidates[0].item, release = (x.releases || [])[0], group = release && release["release-group"];
+      var artworkUrl = group && group.id ? "https://coverartarchive.org/release-group/" + group.id + "/front-500" : (release && release.id ? "https://coverartarchive.org/release/" + release.id + "/front-500" : "");
+      return { title: x.title || T.title, artist: x["artist-credit-phrase"] || T.artist, album: release && release.title ? release.title : (T.album || ""), artworkUrl: artworkUrl };
     });
   }
   $("bScan").addEventListener("click", function () {
