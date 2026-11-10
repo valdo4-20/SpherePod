@@ -759,9 +759,9 @@ body.has-track .screen .art img{animation:kb 22s ease-in-out infinite alternate}
   var motionPreference = lsGet("spherepod-motion") || "auto";
   function detectCoverMotion(T) {
     var meta = [T.artist,T.album,T.title].join(" ").toLowerCase();
-    if (/maroon\\s*5/.test(meta) && /songs?\\s+about\\s+jane/.test(meta)) return "liquid";
-    if (/billie\\s+eilish/.test(meta) && /(when we all fall asleep|dont smile at me|happier than ever)/.test(meta)) return "tear";
-    if (/lil\\s+nas\\s*x/.test(meta) && /(montero|7 ep)/.test(meta)) return "float";
+    if (/maroon\s*5/.test(meta) && /songs?\s+about\s+jane/.test(meta)) return "liquid";
+    if (/billie\s+eilish/.test(meta) && /(when we all fall asleep|dont smile at me|happier than ever)/.test(meta)) return "tear";
+    if (/lil\s+nas\s*x/.test(meta) && /(montero|7 ep)/.test(meta)) return "float";
     return "off";
   }
   function applyCoverMotion(T) {
