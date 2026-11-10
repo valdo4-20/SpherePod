@@ -338,7 +338,7 @@ html,body{min-height:100%;height:100%;overflow:hidden}body{background:var(--bg)}
 .meta h1{font-size:clamp(17px,4.7vw,21px);line-height:1.12}.meta p{margin:3px 0 6px;font-size:13px}
 .times{font-size:11px}.bar{height:18px}.cover-actions{top:9px;right:9px}.cover-actions .pbtn{width:34px;height:34px}
 .settings-pop{max-width:min(270px,calc(100vw - 36px))}.settings-pop .chip{font-size:12px;padding:8px 11px}.chip:disabled{opacity:.55}
-body.is-playing .screen .art img{animation:kb 22s ease-in-out infinite alternate}
+body.has-track .screen .art img{animation:kb 22s ease-in-out infinite alternate}
 @media(max-height:700px){.body{flex-basis:clamp(150px,26svh,190px);height:clamp(150px,26svh,190px)}.wheel{width:min(min(180px,56vw),calc(26svh - 10px))}.meta h1{font-size:17px}.meta p{font-size:12px;margin-bottom:4px}}
 @media(max-height:560px) and (orientation:portrait){.app{gap:4px;padding-top:3px;padding-bottom:3px}.body{flex-basis:126px;height:126px}.wheel{width:120px}.wheel>button{transform:scale(.78)}}
 
@@ -743,13 +743,13 @@ body.is-playing .screen .art img{animation:kb 22s ease-in-out infinite alternate
   function setNowPlaying(T) {
     var img = $("artImg");
     img.classList.remove("pop"); void img.offsetWidth;
-    img.src = T.coverUrl; img.classList.add("pop");
+    img.src = T.coverUrl; img.classList.add("pop"); document.body.classList.add("has-track");
     $("title").textContent = T.title;
     $("artist").textContent = T.artist;
     [$("title"), $("artist")].forEach(function (e) { e.style.animation = "none"; void e.offsetWidth; e.style.animation = ""; });
     document.title = T.title + " · SpherePod";
     try {
-      if ("mediaSession" in navigator) navigator.mediaSession.metadata = new MediaMetadata({ title: T.title, artist: T.artist, album: T.album || "SpherePod", artwork: T.kind === "file" && T.coverUrl.indexOf("blob:") === 0 ? [{ src: T.coverUrl }] : [] });
+      if ("mediaSession" in navigator) navigator.mediaSession.metadata = new MediaMetadata({ title: T.title, artist: T.artist, album: T.album || "SpherePod", artwork: T.coverUrl ? [{ src: T.coverUrl }] : [] });
     } catch (e) {}
   }
   function ui() {
@@ -957,7 +957,7 @@ body.is-playing .screen .art img{animation:kb 22s ease-in-out infinite alternate
     $(".js-knob").forEach(function (e) { e.style.left = "0%"; });
     $(".js-tcur").forEach(function (e) { e.textContent = "0:00"; });
     $(".js-trem").forEach(function (e) { e.textContent = "--:--"; });
-    document.body.classList.remove("is-playing");
+    document.body.classList.remove("is-playing","has-track");
   }
   function removeTrack(id) {
     var idx = list.findIndex(function (t) { return t.id === id; });
