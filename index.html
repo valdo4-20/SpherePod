@@ -424,6 +424,79 @@ body.has-track .screen .art img{animation:kb 22s ease-in-out infinite alternate}
 :root[data-theme="dark"] .meta,
 :root[data-theme="dark"] .meta h1 { color:#fff; }
 
+
+/* Hardware shell: faz o player parecer um iPod físico, não uma página solta. */
+html, body { background:#101115; }
+body {
+  background:
+    radial-gradient(ellipse at 50% 34%, #34363d 0%, #1b1c21 43%, #0b0c0f 100%);
+  overscroll-behavior:none;
+}
+.app {
+  max-width:460px;
+  padding: max(12px,env(safe-area-inset-top)) max(14px,env(safe-area-inset-right)) max(12px,env(safe-area-inset-bottom)) max(14px,env(safe-area-inset-left));
+  filter:drop-shadow(0 24px 38px rgba(0,0,0,.38));
+}
+.device {
+  position:relative;
+  isolation:isolate;
+  padding:10px;
+  gap:12px;
+  border-radius:clamp(34px,8vw,48px);
+  border:1px solid rgba(255,255,255,.78);
+  background:
+    linear-gradient(112deg,rgba(255,255,255,.95) 0%,rgba(177,180,187,.95) 2%,rgba(247,248,250,.98) 7%,rgba(177,180,187,.98) 11%,rgba(235,236,239,.98) 48%,rgba(153,156,164,.98) 94%,rgba(246,247,249,.98) 100%);
+  box-shadow:
+    0 2px 3px rgba(255,255,255,.6),
+    0 8px 20px rgba(0,0,0,.28),
+    inset 0 0 0 1px rgba(65,67,74,.42),
+    inset 0 2px 3px rgba(255,255,255,.9),
+    inset 0 -5px 12px rgba(60,62,70,.24);
+}
+.device::before,
+.device::after {
+  content:"";
+  position:absolute;
+  z-index:-1;
+  width:4px;
+  border:1px solid rgba(255,255,255,.48);
+  background:linear-gradient(90deg,#777a81,#e8e9ec,#92959c);
+  box-shadow:0 1px 3px rgba(0,0,0,.38);
+  pointer-events:none;
+}
+.device::before {
+  left:-5px; top:19%; height:52px; border-radius:4px 0 0 4px;
+  box-shadow:0 1px 3px rgba(0,0,0,.38),0 78px 0 -1px #bfc1c6,0 78px 2px 0 rgba(0,0,0,.3);
+}
+.device::after {
+  right:-5px; top:45%; height:82px; border-radius:0 4px 4px 0;
+}
+.screen {
+  border:1px solid rgba(255,255,255,.18);
+  box-shadow:inset 0 0 0 1px rgba(0,0,0,.25),0 2px 5px rgba(0,0,0,.2);
+}
+.body {
+  border:1px solid rgba(255,255,255,.9);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.96),inset 0 -2px 5px rgba(0,0,0,.08),0 1px 3px rgba(0,0,0,.12);
+}
+.wheel {
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.98),inset 0 -2px 5px rgba(0,0,0,.045),0 2px 5px rgba(0,0,0,.10);
+}
+.wheel > button { transition:color .18s,transform .18s,filter .18s; }
+.wheel > button:active { filter:brightness(.88); }
+@media (max-width:760px) and (orientation:portrait) {
+  .app { padding-left:max(18px,env(safe-area-inset-left)); padding-right:max(18px,env(safe-area-inset-right)); }
+  .device { padding:9px; gap:10px; border-radius:clamp(34px,9vw,46px); }
+  .screen { border-radius:clamp(24px,6vw,34px); }
+  .body { border-radius:clamp(24px,6vw,34px); }
+}
+@media (max-height:620px) {
+  .device { padding:7px; gap:7px; }
+}
+@media (prefers-reduced-motion:reduce) {
+  .device,.screen,.body,.wheel > button { transition:none!important; }
+}
+
 </style>
 
 <svg aria-hidden="true" width="0" height="0" style="position:absolute"><filter id="sphere-liquid" x="-15%" y="-15%" width="130%" height="130%"><feTurbulence type="fractalNoise" baseFrequency=".012 .028" numOctaves="2" seed="7" result="noise"><animate attributeName="baseFrequency" dur="8s" values=".008 .02;.018 .035;.008 .02" repeatCount="indefinite"/></feTurbulence><feDisplacementMap in="SourceGraphic" in2="noise" scale="13" xChannelSelector="R" yChannelSelector="G"><animate attributeName="scale" dur="7s" values="7;17;7" repeatCount="indefinite"/></feDisplacementMap></filter></svg>
