@@ -293,7 +293,9 @@ body.lib-open .fctl { opacity: 0; pointer-events: none; }
 }
 .lib.open { opacity: 1; visibility: visible; pointer-events: auto; transform: none; }
 body[data-view="flow"] .lib { z-index: 5; }
-.lib-head { flex: none; padding: 16px 16px 8px 20px; display: flex; flex-direction: column; gap: 10px; }
+.lib-head { flex: none; padding: max(12px, env(safe-area-inset-top, 0px)) 16px 8px 20px; display: flex; flex-direction: column; gap: 10px; }
+.lib-head > .cover-actions { position: relative; inset: auto; z-index: auto; justify-content: flex-end; opacity: 1; transform: none; pointer-events: auto; }
+.lib-head > .settings-pop { position: absolute; z-index: 20; top: max(102px, calc(env(safe-area-inset-top, 0px) + 102px)); right: 12px; max-height: calc(100% - env(safe-area-inset-top, 0px) - 114px); }
 body[data-view="flow"] .lib-head { padding-right: 214px; }
 body[data-view="flow"] #libClose { display: none; }
 .lib-top { display: flex; align-items: center; gap: 8px; }
@@ -1799,6 +1801,7 @@ body[data-player-color="graphite"] {
 
   /* ---------- Biblioteca (tela de lista) ---------- */
   var lib = $("lib"), libOpen = false, libView = [], libSel = -1, libQuery = "", sortIdx = 0, askId = null, askT = 0, freeText = "";
+  var libHead = $("lib").querySelector(".lib-head"), coverActions = $("coverActions"), settingsPop = $("settingsPop");
   var SORTS = [["added", "Recentes"], ["title", "A–Z"], ["artist", "Artista"]];
   function libItems() {
     var q = libQuery.trim().toLowerCase();
@@ -1816,7 +1819,17 @@ body[data-player-color="graphite"] {
   }
   function subLine(T) {
     var d = T.added ? new Date(T.added).toLocaleDateString("pt-BR", { day: "2-digit", month: "2-digit", year: "2-digit" }) : "";
-    return [T.artist, T.album, T.fmt, T.size ? fmtBytes(T.size) : "", d ? "adicionada em " + d : ""].filter(Boolean).join(" · ");
+    return [T.artist, T.album, T.fmt, d ? "adicionada em " + d : ""].filter(Boolean).join(" · ");
+  }
+  function placeCoverControls() {
+    if (libOpen) {
+      libHead.appendChild(coverActions);
+      libHead.appendChild(settingsPop);
+      return;
+    }
+    var host = document.body.getAttribute("data-view") === "flow" ? $("ftools") : $("screen");
+    host.appendChild(coverActions);
+    host.appendChild(settingsPop);
   }
   function renderLib() {
     if (!libOpen) return;
@@ -1881,9 +1894,11 @@ body[data-player-color="graphite"] {
   }
   function openLib() {
     window.clearTimeout(standbyTimer);
+    settingsPop.classList.remove("open");
     libOpen = true; libSel = -1; libQuery = ""; $("libSearch").value = ""; $("libSearch").hidden = true;
     lib.classList.add("open"); lib.setAttribute("aria-hidden", "false");
     document.body.classList.add("lib-open");
+    placeCoverControls();
     $("bLib").setAttribute("aria-pressed", "true"); $("bLib").classList.add("on");
     renderLib();
     try {
@@ -1893,10 +1908,12 @@ body[data-player-color="graphite"] {
     } catch (e) {}
   }
   function closeLib() {
+    settingsPop.classList.remove("open");
     libOpen = false;
     lib.classList.remove("open"); lib.setAttribute("aria-hidden", "true");
     document.body.classList.remove("lib-open");
     $("bLib").setAttribute("aria-pressed", "false"); $("bLib").classList.remove("on");
+    placeCoverControls();
     scheduleStandby();
   }
   function showEmpty() {
@@ -2738,6 +2755,7 @@ body[data-player-color="graphite"] {
       $("screen").appendChild(lib);
       if (document.fullscreenElement !== $("videoDialog")) $("screen").appendChild($("videoDialog"));
     }
+    if (libOpen) placeCoverControls();
     requestAnimationFrame(function () { layoutFlow(); if (libOpen) keepSelVisible(); });
   }
   $("bView").addEventListener("click", function () {
