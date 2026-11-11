@@ -1,10 +1,12 @@
 "use strict";
 
-var CACHE_NAME = "spherepod-shell-v1";
+var CACHE_NAME = "spherepod-shell-v2";
 var APP_SHELL = [
   "./",
   "./index.html",
   "./manifest.webmanifest",
+  "./BotanicGrotesque-Regular.otf",
+  "./assets/spherepod-logo-white.png",
   "./assets/spherepod-apple-touch-icon.png",
   "./assets/spherepod-icon-192.png",
   "./assets/spherepod-icon-512.png"
