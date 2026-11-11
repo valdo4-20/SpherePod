@@ -215,7 +215,7 @@ body.idle .cover-actions { opacity:0; transform:translateY(-6px); pointer-events
 .wheel > button { position: absolute; border: 0; background: none; padding: 0; cursor: pointer; color: var(--player-wheel-icon); display: grid; place-items: center; width: 56px; height: 56px; border-radius: 50%; transition: color .15s, transform .4s var(--spring), opacity .18s ease; }
 .wheel > button:hover { color: var(--player-wheel-icon-hi); }
 .wheel > button:active { transform: scale(.86); }
-.wheel > button.on { color: var(--accent); }
+.wheel > button.on { color: var(--player-wheel-icon-hi); }
 .wheel svg { width: 28px; height: 28px; }
 .b-top { top: 6%; left: 50%; margin-left: -28px; }
 .b-bot { bottom: 6%; left: 50%; margin-left: -28px; }
@@ -288,10 +288,10 @@ body.lib-open .fctl { opacity: 0; pointer-events: none; }
 .lib {
   position: absolute; inset: 0; z-index: 12; display: flex; flex-direction: column; overflow: hidden;
   background: var(--lib-bg); color: var(--lib-fg); border-radius: inherit;
-  opacity: 0; visibility: hidden; transform: scale(.97);
+  opacity: 0; visibility: hidden; pointer-events: none; transform: scale(.97);
   transition: opacity .35s ease, transform .5s var(--ease), visibility .35s;
 }
-.lib.open { opacity: 1; visibility: visible; transform: none; }
+.lib.open { opacity: 1; visibility: visible; pointer-events: auto; transform: none; }
 body[data-view="flow"] .lib { z-index: 5; }
 .lib-head { flex: none; padding: 16px 16px 8px 20px; display: flex; flex-direction: column; gap: 10px; }
 body[data-view="flow"] .lib-head { padding-right: 214px; }
@@ -1485,7 +1485,11 @@ body[data-player-color="graphite"] {
     var dl = ctx.createDelay(1); dl.delayTime.value = 0.34;
     var fb = ctx.createGain(); fb.gain.value = 0.35;
     wet.connect(dl); dl.connect(fb); fb.connect(dl); dl.connect(master);
-    try { audSrc = ctx.createMediaElementSource(aud); audSrc.connect(master); } catch (e) { audSrc = null; aud.volume = volume * volume; }
+    try {
+      audSrc = ctx.createMediaElementSource(aud);
+      audSrc.connect(master);
+      aud.volume = 1;
+    } catch (e) { audSrc = null; aud.volume = volume * volume; }
     newBus();
   }
   function newBus() {
@@ -1698,6 +1702,7 @@ body[data-player-color="graphite"] {
   }
   function ui() {
     refreshPlayControls();
+    ["bShuffle", "bShuffle2"].forEach(function (id) { $(id).classList.toggle("on", shuffle); $(id).setAttribute("aria-pressed", shuffle); });
     var T = list[cur];
     if (!T) return;
     var p = curPos(), f = T.dur > 0 ? Math.min(1, p / T.dur) : 0;
@@ -1712,7 +1717,6 @@ body[data-player-color="graphite"] {
     $$(".js-tcur").forEach(function (e) { e.textContent = fmt(p); });
     $$(".js-trem").forEach(function (e) { e.textContent = T.dur > 0 ? "-" + fmt(T.dur - p) : "--:--"; });
     $$(".bar").forEach(function (e) { e.setAttribute("aria-valuenow", Math.round(f * 100)); });
-    ["bShuffle", "bShuffle2"].forEach(function (id) { $(id).classList.toggle("on", shuffle); $(id).setAttribute("aria-pressed", shuffle); });
     document.body.classList.toggle("is-playing", playing);
     $$(".cf-item").forEach(function (e, i) { e.classList.toggle("playing", playing && i === cur); });
     if (libOpen) $$("#libList .rowx").forEach(function (r) { r.classList.toggle("playing", playing && r.getAttribute("data-id") === T.id); });
@@ -2559,6 +2563,8 @@ body[data-player-color="graphite"] {
   /* Volume e roda */
   var volTimer = 0;
   function setVol(v, quiet) {
+    v = Number(v);
+    if (!isFinite(v)) return;
     volume = Math.max(0, Math.min(1, v));
     if (master) master.gain.setTargetAtTime(volume * volume, ctx.currentTime, 0.02);
     if (!audSrc) aud.volume = volume * volume;
