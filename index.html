@@ -443,7 +443,7 @@ html,body{min-height:100%;height:100%;overflow:hidden}body{background:var(--bg)}
 /* Player portrait — composição inspirada na referência enviada */
 @media (max-width: 760px) and (orientation: portrait) {
   html, body { background:#050506; }
-  .app { gap:clamp(8px,1.2vh,12px); padding-left:max(10px,env(safe-area-inset-left)); padding-right:max(10px,env(safe-area-inset-right)); }
+  .app { gap:clamp(8px,1.2vh,12px); padding-left:max(10px,env(safe-area-inset-left)); padding-right:max(10px,env(safe-area-inset-right)); padding-bottom:0; }
   .device { gap:clamp(8px,1.2vh,12px); }
   .screen { flex:1 1 0; min-height:0; border-radius:clamp(24px,6vw,34px); background:#171719; }
   .screen .art img { object-fit:cover; }
@@ -462,8 +462,8 @@ html,body{min-height:100%;height:100%;overflow:hidden}body{background:var(--bg)}
   .bar .fill { background:#fff; }
   .bar .knob { width:14px; height:14px; background:#fff; }
   .times { font-size:13px; color:rgba(255,255,255,.88); }
-  .body { flex:0 0 38%; height:38%; min-height:220px; max-height:360px; padding:clamp(12px,2.2vh,24px) 0;
-    border-radius:clamp(24px,6vw,34px); background:linear-gradient(180deg,var(--player-panel-top),var(--player-panel-bottom));
+  .body { flex:0 0 calc(38% + env(safe-area-inset-bottom,0px)); height:calc(38% + env(safe-area-inset-bottom,0px)); min-height:220px; max-height:calc(360px + env(safe-area-inset-bottom,0px)); padding:clamp(12px,2.2vh,24px) 0 max(clamp(12px,2.2vh,24px),env(safe-area-inset-bottom,0px));
+    border-radius:clamp(24px,6vw,34px) clamp(24px,6vw,34px) 0 0; background:linear-gradient(180deg,var(--player-panel-top),var(--player-panel-bottom));
     box-shadow:0 14px 36px rgba(0,0,0,.18); }
   .wheel { width:min(78%, min(390px, calc(38svh - 28px))); background:radial-gradient(circle at 50% 18%,var(--player-wheel-top) 0%,var(--player-wheel-top) 65%,var(--player-wheel-bottom) 100%);
     box-shadow:inset 0 1px 0 rgba(255,255,255,.95),0 2px 8px rgba(0,0,0,.08); }
@@ -474,11 +474,12 @@ html,body{min-height:100%;height:100%;overflow:hidden}body{background:var(--bg)}
   .wheel > button.center svg { width:34px;height:34px; }
   .status { top:14px; left:18px; color:#fff; }
   .cover-actions { top:12px; right:12px; }
+  .settings-pop { top:max(110px,calc(env(safe-area-inset-top,0px) + 58px)); }
   .cover-actions .pbtn { background:rgba(12,12,16,.78); }
   .hint { display:none; }
 }
 @media (max-width: 760px) and (max-height: 720px) and (orientation: portrait) {
-  .body { flex-basis:36%; height:36%; min-height:184px; }
+  .body { flex-basis:calc(36% + env(safe-area-inset-bottom,0px)); height:calc(36% + env(safe-area-inset-bottom,0px)); min-height:calc(184px + env(safe-area-inset-bottom,0px)); max-height:calc(360px + env(safe-area-inset-bottom,0px)); }
   .wheel { width:min(74%,calc(36svh - 24px)); }
   .meta { padding-top:18px; }
 }
@@ -703,7 +704,7 @@ body:not(.has-track) .screen {
 .wheel > button:active svg { transform:scale(.88); }
 .wheel > button svg { transition:transform .18s ease; }
 @media (max-width:760px) and (orientation:portrait) {
-  .cover-actions { top:42px; }
+  .cover-actions { top:max(64px,calc(env(safe-area-inset-top,0px) + 12px)); }
   .meta {
     isolation:isolate;
     background:transparent;
