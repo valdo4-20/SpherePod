@@ -901,6 +901,11 @@ body[data-player-color="graphite"] {
   --player-wheel-icon:#bfc2c9; --player-wheel-icon-hi:#ffffff;
   --player-center-top:#747780; --player-center-bottom:#555861; --player-center-ink:#ffffff;
 }
+@media (max-width:760px) and (orientation:portrait) {
+  html { background:transparent; }
+  :root:not([data-theme="light"]) body[data-view="wheel"],
+  :root[data-theme="light"] body[data-view="wheel"] { background:var(--player-panel-bottom); }
+}
 </style>
 
 <main class="app">
