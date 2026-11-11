@@ -9,6 +9,7 @@
 <meta name="apple-mobile-web-app-title" content="SpherePod">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <title>SpherePod — seu player pessoal</title>
+<link rel="icon" type="image/png" sizes="32x32" href="./assets/spherepod-favicon-32.png">
 <link rel="apple-touch-icon" sizes="180x180" href="./assets/spherepod-apple-touch-icon.png">
 <link rel="manifest" href="./manifest.webmanifest">
 </head>
@@ -1452,11 +1453,14 @@ body[data-player-color="graphite"] {
 
   /* ---------- Áudio ---------- */
   var ctx = null, master = null, bus = null, wet = null, aud = new Audio(), audSrc = null;
+  var isAppleMobile = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
   var audioAnalyser = null, audioSilentGain = null;
+  var lastMediaPositionUpdate = 0;
   var t0 = 0, nextStep = 0, timer = 0, raf = 0, srcNode = null, bufCache = { id: null, buf: null }, curUrl = null;
   aud.preload = "auto";
 
   function ensureCtx() {
+    if (isAppleMobile) { aud.volume = volume * volume; return; }
     if (ctx) { if (ctx.state === "suspended") ctx.resume(); return; }
     var AC = window.AudioContext || window.webkitAudioContext;
     if (!AC) return;
@@ -1528,7 +1532,10 @@ body[data-player-color="graphite"] {
   }
   function fileFail() {
     var T = list[cur];
-    if (!T || T.kind !== "file" || T.mode === "buf" || !ctx) { if (playing) { playing = false; ui(); toast("Não consegui tocar este arquivo."); } return; }
+    if (!T || T.kind !== "file" || T.mode === "buf" || !ctx) {
+      if (playing) { playing = false; ui(); toast(isAppleMobile ? "Este formato de áudio não é compatível com o iPhone." : "Não consegui tocar este arquivo."); }
+      return;
+    }
     var p = pos || 0;
     T.mode = "buf";
     try { aud.pause(); } catch (e) {}
@@ -1690,6 +1697,12 @@ body[data-player-color="graphite"] {
     var T = list[cur];
     if (!T) return;
     var p = curPos(), f = T.dur > 0 ? Math.min(1, p / T.dur) : 0;
+    if ("mediaSession" in navigator && navigator.mediaSession.setPositionState && T.dur > 0 && Date.now() - lastMediaPositionUpdate >= 1000) {
+      try {
+        navigator.mediaSession.setPositionState({ duration:T.dur, playbackRate:1, position:Math.min(T.dur, Math.max(0, p)) });
+        lastMediaPositionUpdate = Date.now();
+      } catch (e) {}
+    }
     $$(".js-fill").forEach(function (e) { e.style.width = (f * 100) + "%"; });
     $$(".js-knob").forEach(function (e) { e.style.left = (f * 100) + "%"; });
     $$(".js-tcur").forEach(function (e) { e.textContent = fmt(p); });
@@ -2642,10 +2655,25 @@ body[data-player-color="graphite"] {
   });
   try {
     if ("mediaSession" in navigator) {
-      navigator.mediaSession.setActionHandler("play", function () { setActivePlayback(true); });
-      navigator.mediaSession.setActionHandler("pause", function () { setActivePlayback(false); });
-      navigator.mediaSession.setActionHandler("nexttrack", next);
-      navigator.mediaSession.setActionHandler("previoustrack", prev);
+      var mediaActions = {
+        play:function () { setActivePlayback(true); },
+        pause:function () { setActivePlayback(false); },
+        stop:function () { setActivePlayback(false); },
+        nexttrack:next,
+        previoustrack:prev,
+        seekbackward:function (details) { seekRel(-(details.seekOffset || 10)); },
+        seekforward:function (details) { seekRel(details.seekOffset || 10); },
+        seekto:function (details) {
+          var T = list[cur];
+          if (!T || !isFinite(details.seekTime)) return;
+          var target = Math.max(0, Math.min(T.dur || details.seekTime, details.seekTime));
+          if (usesBuf(T)) seekRel(target - curPos());
+          else { pos = target; aud.currentTime = target; ui(); }
+        }
+      };
+      Object.keys(mediaActions).forEach(function (action) {
+        try { navigator.mediaSession.setActionHandler(action, mediaActions[action]); } catch (e) {}
+      });
     }
   } catch (e) {}
 
