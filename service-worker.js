@@ -1,6 +1,6 @@
 "use strict";
 
-var CACHE_NAME = "spherepod-shell-v3";
+var CACHE_NAME = "spherepod-shell-v4";
 var APP_SHELL = [
   "./",
   "./index.html",

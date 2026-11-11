@@ -19,6 +19,7 @@ Player pessoal de áudio e vídeo, com interface inspirada em um music player cl
 - Biblioteca e configurações acessíveis diretamente pela capa.
 - Fundo de vidro fosco atrás das informações da faixa.
 - Importação local de áudio para biblioteca persistente no navegador (IndexedDB). Os arquivos escolhidos são copiados para o armazenamento local e reproduzidos de lá, sem depender de conexão depois de importados.
+- Importação de pastas de músicas pela biblioteca, pelas configurações ou na tela de boas-vindas; o SpherePod procura arquivos de áudio compatíveis na pasta e em suas subpastas.
 - Cache do app shell via service worker para reabrir o player sem rede após a primeira visita online. No iPhone, use **Adicionar à Tela de Início** e abra o SpherePod instalado para melhor suporte offline.
 - Vídeos importados aparecem na tela principal do iPod, com controles de reprodução, saltos de −10/+10 segundos, logo branca no canto superior esquerdo e título que desaparecem junto com os controles após alguns segundos. Um toque em tela cheia alterna a visibilidade da interface; o botão permite entrar ou sair desse modo. A roda permanece na interface normal e some durante a tela cheia. O app pede orientação paisagem em navegadores compatíveis e usa uma apresentação girada como fallback quando o bloqueio não funciona.
 - Transmissor por URL: aceita links diretos e tenta localizar referências de vídeo em páginas cujo servidor permita CORS; o diálogo mantém as ações acessíveis em telas estreitas.

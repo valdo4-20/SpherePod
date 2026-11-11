@@ -332,6 +332,7 @@ body[data-view="flow"] #libClose { display: none; }
 .lib-none { padding: 24px 16px; text-align: center; font-size: 14px; color: var(--lib-muted); }
 .lib-foot { flex: none; display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 8px 16px 14px 20px; font-size: 12.5px; color: var(--lib-muted); }
 .lib-foot span { min-width: 0; line-height: 1.35; }
+.lib-actions { display:flex; flex:none; gap:8px; }
 
 .toast { position: absolute; z-index: 30; top: auto; bottom: clamp(88px, 16%, 132px); left: 50%; max-width: min(92%, 420px); padding: 11px 18px; border-radius: 18px; font-family:var(--font-controls); font-size: 14px; font-weight: 500; text-align: center; pointer-events:none; opacity:0; transform: translate(-50%, 12px); transition: transform .35s ease, opacity .25s ease; }
 .toast.show { opacity:1; transform: translate(-50%, 0); }
@@ -919,6 +920,7 @@ body[data-player-color="graphite"] {
       </div>
       <div class="settings-pop glass" id="settingsPop">
         <button class="chip" id="bAdd">Adicionar áudio ou vídeo</button>
+        <button class="chip" id="bAddFolder">Importar pasta de músicas</button>
         <button class="chip" id="bStream">Reproduzir por link</button>
         <button class="chip" id="bScan">Escanear músicas e buscar capas</button>
         <button class="chip" id="bRemoveAnimatedCover" hidden>Remover capa animada</button>
@@ -1083,9 +1085,10 @@ body[data-player-color="graphite"] {
     </section>
     <section class="onboarding-card" aria-labelledby="onboardingMusicTitle">
       <h2 id="onboardingMusicTitle">Importar músicas (opcional)</h2>
-      <p>Escolha arquivos de áudio. O navegador só permite acesso aos arquivos selecionados; eles são copiados para o armazenamento local do SpherePod e ficam disponíveis offline neste dispositivo.</p>
+      <p>Escolha arquivos de áudio ou uma pasta de músicas. Os arquivos compatíveis encontrados são copiados para o armazenamento local do SpherePod e ficam disponíveis offline neste dispositivo.</p>
       <div class="onboarding-actions">
         <button class="chip" id="onboardingImport" disabled>Escolher músicas do dispositivo</button>
+        <button class="chip" id="onboardingImportFolder" disabled>Importar pasta de músicas</button>
       </div>
       <p class="onboarding-state" id="onboardingImportState" aria-live="polite">Você também pode importar depois pela biblioteca.</p>
     </section>
@@ -1107,12 +1110,13 @@ body[data-player-color="graphite"] {
     <input class="lib-search" id="libSearch" type="search" placeholder="Buscar por título, artista ou álbum" aria-label="Buscar na biblioteca" hidden>
   </header>
   <div class="lib-list" id="libList" role="listbox" aria-label="Faixas"></div>
-  <footer class="lib-foot"><span id="libStore"></span><button class="chip" id="libAdd">Adicionar</button></footer>
+  <footer class="lib-foot"><span id="libStore"></span><div class="lib-actions"><button class="chip" id="libAdd">Arquivos</button><button class="chip" id="libAddFolder">Pasta</button></div></footer>
 </section>
 
 <div class="dropmask" id="dropmask">Solte para adicionar à biblioteca</div>
 <input type="file" id="file" accept="audio/*,video/*,.mp3,.m4a,.aac,.flac,.wav,.ogg,.opus,.mp4,.m4v,.mov,.webm,.ogv,.mkv" multiple hidden>
 <input type="file" id="onboardingAudioFile" accept="audio/*,.mp3,.m4a,.aac,.flac,.wav,.ogg,.opus,.oga,.weba" multiple hidden>
+<input type="file" id="folder" accept="audio/*,.mp3,.m4a,.aac,.flac,.wav,.ogg,.opus,.oga,.weba" webkitdirectory directory multiple hidden>
 <section class="stream-dialog glass" id="streamDialog" aria-hidden="true">
   <div class="stream-head"><strong>Transmitir por link</strong><button class="pbtn sm" id="streamClose" aria-label="Fechar">×</button></div>
   <p>Cole o endereço de uma página. O SpherePod procura vídeos públicos identificáveis no HTML e nos links acessíveis.</p>
@@ -1939,18 +1943,18 @@ body[data-player-color="graphite"] {
   var AUDIO_RE = /\.(mp3|m4a|aac|flac|wav|ogg|opus|oga|weba)$/i;
   /* OGG é áudio por padrão; só será vídeo se o MIME declarar video/. */
   var VIDEO_RE = /\.(mp4|m4v|mov|webm|ogv|mkv|avi)$/i;
+  function mediaKind(f) {
+    var mime = String(f.type || "").toLowerCase();
+    if (mime.indexOf("video/") === 0) return "video";
+    if (mime.indexOf("audio/") === 0) return "audio";
+    if (VIDEO_RE.test(f.name)) return "video";
+    if (AUDIO_RE.test(f.name)) return "audio";
+    return "";
+  }
   function importFiles(files, onComplete) {
     var picked = Array.prototype.slice.call(files || []);
     function finishImport(count, failed) {
       if (typeof onComplete === "function") onComplete(count, failed);
-    }
-    function mediaKind(f) {
-      var mime = String(f.type || "").toLowerCase();
-      if (mime.indexOf("video/") === 0) return "video";
-      if (mime.indexOf("audio/") === 0) return "audio";
-      if (VIDEO_RE.test(f.name)) return "video";
-      if (AUDIO_RE.test(f.name)) return "audio";
-      return "";
     }
     var vids = picked.filter(function (f) { return mediaKind(f) === "video"; });
     var arr = picked.filter(function (f) { return mediaKind(f) === "audio"; });
@@ -2000,10 +2004,9 @@ body[data-player-color="graphite"] {
   }
   var fileInput = $("file");
   fileInput.addEventListener("change", function () { importFiles(fileInput.files); fileInput.value = ""; });
+  var folderInput = $("folder");
   var onboardingAudioFile = $("onboardingAudioFile");
-  onboardingAudioFile.addEventListener("change", function () {
-    var files = onboardingAudioFile.files;
-    onboardingAudioFile.value = "";
+  function importOnboardingFiles(files) {
     if (!files || !files.length) return;
     $("onboardingImportState").textContent = "Importando e salvando as músicas neste dispositivo…";
     importFiles(files, function (count, failed) {
@@ -2012,8 +2015,29 @@ body[data-player-color="graphite"] {
         (count ? count + (count === 1 ? " música salva neste dispositivo e pronta para uso offline." : " músicas salvas neste dispositivo e prontas para uso offline.") :
           "Nenhuma música foi importada. Escolha um arquivo de áudio compatível.");
     });
+  }
+  onboardingAudioFile.addEventListener("change", function () {
+    var files = onboardingAudioFile.files;
+    onboardingAudioFile.value = "";
+    importOnboardingFiles(files);
+  });
+  $("onboardingImportFolder").addEventListener("click", function () {
+    if (!onboardingAccepted) return;
+    folderInput.click();
+  });
+  folderInput.addEventListener("change", function () {
+    var files = Array.prototype.filter.call(folderInput.files || [], function (file) { return mediaKind(file) === "audio"; });
+    folderInput.value = "";
+    if (!files.length) {
+      toast("Nenhum arquivo de áudio compatível foi encontrado nesta pasta.");
+      if (!onboardingComplete) $("onboardingImportState").textContent = "Nenhum arquivo de áudio compatível foi encontrado nesta pasta.";
+      return;
+    }
+    if (onboardingComplete) importFiles(files);
+    else importOnboardingFiles(files);
   });
   function pickFiles() { fileInput.click(); }
+  function pickFolder() { folderInput.click(); }
   $("bRemoveAnimatedCover").addEventListener("click", function () {
     var T = list[cur];
     if (!T || !T.animatedCoverBlob) return;
@@ -2591,6 +2615,7 @@ body[data-player-color="graphite"] {
   btn("bShuffle", toggleShuffle); btn("bShuffle2", toggleShuffle);
   btn("bLib", function () { libOpen ? closeLib() : openLib(); });
   btn("bAdd", pickFiles); btn("libAdd", pickFiles);
+  btn("bAddFolder", pickFolder); btn("libAddFolder", pickFolder);
   $("libClose").addEventListener("click", closeLib);
   $("libSort").addEventListener("click", function () { sortIdx = (sortIdx + 1) % SORTS.length; libSel = -1; renderLib(); $("libList").scrollTop = 0; });
   $("libSearchBtn").addEventListener("click", function () {
@@ -2779,6 +2804,7 @@ body[data-player-color="graphite"] {
   }
   function unlockOnboardingActions() {
     $("onboardingImport").disabled = !onboardingAccepted;
+    $("onboardingImportFolder").disabled = !onboardingAccepted;
     $("onboardingContinue").disabled = !onboardingAccepted;
     $("onboardingConsentState").textContent = onboardingAccepted ? "Aceite registrado neste dispositivo." : "Necessário para continuar.";
   }
